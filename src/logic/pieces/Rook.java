@@ -30,8 +30,8 @@ public class Rook extends Piece {
         int rowDir = Integer.compare(newRow, row); // 1 nếu a > b, 0 nếu a == b, -1 nếu a < b.
         int colDir = Integer.compare(newCol, col);
 
-        int currentRow = row + rowDir;
-        int currentCol = col + colDir;
+        int currentRow = row + rowDir;	// =1 hoặc 0
+        int currentCol = col + colDir;	// tương tự
         
         //kiểm tra có bị chặn hay k (step = dir (=1) kiểm tra từng step
         while (currentRow != newRow || currentCol != newCol) {
