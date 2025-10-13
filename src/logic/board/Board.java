@@ -3,12 +3,17 @@ package logic.board;
 import logic.pieces.Rook;
 import logic.pieces.Pawn;
 import logic.pieces.Piece;
+import logic.move.Move;   // nhớ import class Move
+import java.util.ArrayList;
+import java.util.List;
 
 public class Board {
     private Piece[][] board;
+    private List<Move> moveHistory;  // lịch sử nước đi
 
     public Board() {
         board = new Piece[8][8];
+        moveHistory = new ArrayList<>();
         setupPieces();
     }
 
@@ -33,15 +38,15 @@ public class Board {
         return board[row][col];
     }
 
-    public void movePiece(int fromRow, int fromCol, int toRow, int toCol) {
-        if (!isValidPosition(fromRow, fromCol) || !isValidPosition(toRow, toCol)) return;
+    public void executeMove(Move move) {
+        move.execute(board);          // thực hiện nước đi
+        moveHistory.add(move);        // lưu lịch sử
+    }
 
-        Piece piece = board[fromRow][fromCol];
-        if (piece != null) {
-            board[toRow][toCol] = piece;
-            board[fromRow][fromCol] = null;
-            piece.setPosition(toRow, toCol);
-        }
+    public void undoLastMove() {
+        if (moveHistory.isEmpty()) return;
+        Move lastMove = moveHistory.remove(moveHistory.size() - 1);
+        lastMove.undo(board);
     }
 
     public Piece[][] getBoard() {
@@ -50,5 +55,9 @@ public class Board {
 
     public boolean isValidPosition(int row, int col) {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
+    }
+
+    public List<Move> getMoveHistory() {
+        return moveHistory;
     }
 }
