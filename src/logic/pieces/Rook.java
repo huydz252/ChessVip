@@ -45,5 +45,7 @@ public class Rook extends Piece {
         // Ô đến có thể trống hoặc chứa quân khác màu
         Piece target = board[newRow][newCol];
         return (target == null || target.isWhite() != this.isWhite);
+        
+        //test commit on branch qhuy
     }
 }
