@@ -5,12 +5,16 @@ import java.awt.*;
 
 public class MenuPanel extends JPanel {
 
+    public JButton localBtn;
+    public JButton aiBtn;
+    public JButton onlineBtn;
+
     public MenuPanel() {
         setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        JButton localBtn = new JButton("Play vs Player");
-        JButton aiBtn = new JButton("Play vs AI");
-        JButton onlineBtn = new JButton("Online");
+        localBtn = new JButton("Play vs Player");
+        aiBtn = new JButton("Play vs AI");
+        onlineBtn = new JButton("Online");
 
         add(localBtn);
         add(aiBtn);
