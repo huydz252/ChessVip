@@ -1,5 +1,7 @@
 package logic.pieces;
 
+import javax.swing.ImageIcon;
+
 public class Pawn extends Piece {
 	public Pawn(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
@@ -8,6 +10,12 @@ public class Pawn extends Piece {
     @Override
     public char getSymbol() {
         return isWhite ? 'P' : 'p';
+    }
+    
+    @Override
+    public void loadImage() {
+        String filename = isWhite ? "white_pawn.png" : "black_pawn.png";
+        image = new ImageIcon(getClass().getResource("/resources/images/" + filename));
     }
 
     @Override

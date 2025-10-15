@@ -16,7 +16,9 @@ public class GameController {
         whiteTurn = true;
     }
     
-    
+    public boolean isWhiteTurn() {
+        return whiteTurn;
+    }
 
     // Thực hiện nước đi
     public boolean move(int fromRow, int fromCol, int toRow, int toCol) {
@@ -44,6 +46,7 @@ public class GameController {
 
         // Thực hiện nước đi và lưu lịch sử
         board.executeMove(move);
+        
 
         // Đổi lượt
         whiteTurn = !whiteTurn;

@@ -1,7 +1,11 @@
 package logic.board;
 
 import logic.pieces.Rook;
+import logic.pieces.King;
+import logic.pieces.Knight;
 import logic.pieces.Pawn;
+import logic.pieces.Bishop;
+import logic.pieces.Queen;
 import logic.pieces.Piece;
 import logic.move.Move;   // nhớ import class Move
 import java.util.ArrayList;
@@ -19,19 +23,68 @@ public class Board {
 
     private void setupPieces() {
         // --- Quân trắng ---
+        // Hàng 6: Pawn
         for (int col = 0; col < 8; col++) {
             board[6][col] = new Pawn(true, 6, col);
+            board[6][col].loadImage();
         }
+        // Hàng 7: Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook
         board[7][0] = new Rook(true, 7, 0);
+        board[7][0].loadImage();
+        
+        board[7][1] = new Knight(true, 7, 1);
+        board[7][1].loadImage();
+        
+        board[7][2] = new Bishop(true, 7, 2);
+        board[7][2].loadImage();
+        
+        board[7][3] = new Queen(true, 7, 3);
+        board[7][3].loadImage();
+        
+        board[7][4] = new King(true, 7, 4);
+        board[7][4].loadImage();
+        
+        board[7][5] = new Bishop(true, 7, 5);
+        board[7][5].loadImage();
+        
+        board[7][6] = new Knight(true, 7, 6);
+        board[7][6].loadImage();
+        
         board[7][7] = new Rook(true, 7, 7);
+        board[7][7].loadImage();
 
         // --- Quân đen ---
+        // Hàng 1: Pawn
         for (int col = 0; col < 8; col++) {
             board[1][col] = new Pawn(false, 1, col);
+            board[1][col].loadImage();
         }
+        // Hàng 0: Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook
         board[0][0] = new Rook(false, 0, 0);
+        board[0][0].loadImage();
+        
+        board[0][1] = new Knight(false, 0, 1);
+        board[0][1].loadImage();
+        
+        board[0][2] = new Bishop(false, 0, 2);
+        board[0][2].loadImage();
+        
+        board[0][3] = new Queen(false, 0, 3);
+        board[0][3].loadImage();
+        
+        board[0][4] = new King(false, 0, 4);
+        board[0][4].loadImage();
+        
+        board[0][5] = new Bishop(false, 0, 5);
+        board[0][5].loadImage();
+        
+        board[0][6] = new Knight(false, 0, 6);
+        board[0][6].loadImage();
+        
         board[0][7] = new Rook(false, 0, 7);
+        board[0][7].loadImage();
     }
+
 
     public Piece getPiece(int row, int col) {
         if (!isValidPosition(row, col)) return null;

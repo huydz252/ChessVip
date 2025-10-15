@@ -1,5 +1,9 @@
 package logic.pieces;
 
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+
 public class Knight extends Piece{
 	public Knight(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
@@ -9,6 +13,18 @@ public class Knight extends Piece{
     public char getSymbol() {
         return isWhite ? 'K' : 'k';
     }
+    
+    @Override
+    public void loadImage() {
+        String filename = isWhite ? "white_knight.png" : "black_knight.png";
+        URL url = getClass().getResource("/resources/images/" + filename);
+        if (url == null) {
+            System.out.println("Cannot find: " + filename);
+        } else {
+            image = new ImageIcon(url);
+        }
+    }
+
     
     @Override
     public boolean isValidMove(int newRow, int newCol, Piece[][] board) {

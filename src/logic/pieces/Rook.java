@@ -1,5 +1,8 @@
 package logic.pieces;
 
+import javax.print.DocFlavor.URL;
+import javax.swing.ImageIcon;
+
 public class Rook extends Piece {
 
     public Rook(boolean isWhite, int row, int col) {
@@ -11,11 +14,18 @@ public class Rook extends Piece {
         return isWhite ? 'R' : 'r';
     }
     
-    
-    //override lại hàm isValidMove vì Rook extend Piece:
-    //định nghĩa và kiểm tra cách di chuyển của quân xe (Rook)
-    
-    
+    @Override
+    public void loadImage() {
+        String filename = isWhite ? "white_rook.png" : "black_rook.png";
+        java.net.URL url = getClass().getResource("/resources/images/" + filename);
+        if (url == null) {
+            System.out.println("Cannot find: " + filename);
+        } else {
+            image = new ImageIcon(url);
+        }
+    }
+
+       
     @Override
     public boolean isValidMove(int newRow, int newCol, Piece[][] board) {
         // Không di chuyển nếu trùng vị trí
