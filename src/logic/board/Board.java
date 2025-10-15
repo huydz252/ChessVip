@@ -60,4 +60,38 @@ public class Board {
     public List<Move> getMoveHistory() {
         return moveHistory;
     }
+    
+    //lay danh sach quan 1 phia
+    public List<Piece> getAllPieces(boolean whiteKing){
+    	
+    	List<Piece> pieces = new ArrayList<Piece>();
+    	for(int r = 0; r < 8; r++) {
+    		for(int c = 0; c < 8; c++) {
+    			if(board[r][c]!= null && board[r][c].isWhite() == whiteKing) {
+    				pieces.add(board[r][c]);
+    			}
+    		}
+    	}
+    	return pieces;
+    } 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

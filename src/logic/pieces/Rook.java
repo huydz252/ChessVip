@@ -31,7 +31,7 @@ public class Rook extends Piece {
         int colDir = Integer.compare(newCol, col);
 
         int currentRow = row + rowDir;	// =1 hoặc 0
-        int currentCol = col + colDir;	// tương tự
+        int currentCol = col + colDir;	// tương tự, chỉ là để xác định hướng đi của xe
         
         //kiểm tra có bị chặn hay k (step = dir (=1) kiểm tra từng step
         while (currentRow != newRow || currentCol != newCol) {
@@ -48,4 +48,6 @@ public class Rook extends Piece {
         
         //test commit on branch qhuy
     }
+    
+    
 }

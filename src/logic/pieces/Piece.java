@@ -26,6 +26,7 @@ public abstract class Piece {
         this.row = row;
         this.col = col;
     }
+    
 
     public abstract char getSymbol(); 	//nhận diện quân nào và màu nào 
     
