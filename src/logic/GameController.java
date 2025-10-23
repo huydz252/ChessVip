@@ -5,8 +5,13 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import logic.board.Board;
+import logic.pieces.Bishop;
 import logic.pieces.King;
+import logic.pieces.Knight;
+import logic.pieces.Pawn;
 import logic.pieces.Piece;
+import logic.pieces.Queen;
+import logic.pieces.Rook;
 import logic.move.Move;
 
 public class GameController {
@@ -54,9 +59,19 @@ public class GameController {
 
         if (leaveInCheck) return false;
 
-        // --- Nếu nước đi hợp lệ và không khiến vua bị chiếu ---
+        //Nếu nước đi hợp lệ và không khiến vua bị chiếu
         Move move = new Move(piece, toRow, toCol, captured);
         board.executeMove(move);
+        
+        //kiểm tra phong cấp tốt:
+        if(isPawnPromotion(piece, toRow)) {
+        	Piece promotedPiece = promotePawn(piece.isWhite(), toRow, toCol);
+        	
+        	//cập nhật quân cờ mới
+        	board.getBoard()[toRow][toCol] = promotedPiece;
+        	
+        	promotedPiece.loadImage();
+        }
 
         whiteTurn = !whiteTurn; // Đổi lượt chơi. whiteTurn BÂY GIỜ là màu của người chơi tiếp theo.
 
@@ -125,11 +140,10 @@ public class GameController {
     // Hàm kiểm tra chiếu hết (Đã sửa lỗi logic)
     public boolean isCheckMate(boolean whiteKing) {
         // 1. Kiểm tra vua có đang bị check không
-        if (!isCheck(whiteKing)) return false; // SỬA LỖI 2: Chỉ kiểm tra vua CÓ MÀU whiteKing
-
+        if (!isCheck(whiteKing)) return false; 
         Piece[][] b = board.getBoard();
         // 2. Lấy tất cả quân cờ CÙNG MÀU với vua đang bị kiểm tra
-        List<Piece> pieces = board.getAllPieces(whiteKing); // SỬA LỖI 3: Lấy quân cờ của phe BỊ CHIẾU (whiteKing)
+        List<Piece> pieces = board.getAllPieces(whiteKing); 
 
         for (Piece piece : pieces) {
             int originalRow = piece.getRow();
@@ -149,7 +163,7 @@ public class GameController {
                         piece.setPosition(r, c);
 
                         // Nếu vua KHÔNG CÒN bị check sau nước đi này → KHÔNG phải checkmate
-                        if (!isCheck(whiteKing)) { // SỬA LỖI 4: Kiểm tra vua CÓ MÀU whiteKing
+                        if (!isCheck(whiteKing)) { 
                             
                             // Khôi phục trạng thái cũ
                             piece.setPosition(originalRow, originalCol);
@@ -170,4 +184,70 @@ public class GameController {
         // Sau khi thử tất cả nước đi và không có nước nào thoát check → checkmate
         return true;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //------- KIỂM TRA PHONG CẤP 
+    
+  
+    // 1. hàm kiểm tra phong cấp
+    public boolean isPawnPromotion(Piece piece, int toRow) {
+    	
+    	if(!(piece instanceof Pawn)) return false;
+    	
+    	//tốt trắng
+    	if(piece.isWhite() && toRow == 0) return true;
+    	//tốt đen
+    	if(!piece.isWhite() && toRow == 7) return true;
+    	
+    	return false; //k phải nước đi phong cấp
+    }
+    
+    
+    // 2. hàm yêu cầu người chơi lựa chọn quân thay thế cho tốt
+    private Piece promotePawn(boolean isWhite, int row, int col) {
+    	String[] options = {"Queen", "Rook", "Knight", "Bishop"};
+    	String choice = (String) JOptionPane.showInputDialog(null, 
+                "Chọn quân để phong cấp:",
+                "Phong Cấp Tốt",
+                JOptionPane.QUESTION_MESSAGE,
+                null, 
+                options,
+                options[0]);
+    	if (choice == null || choice.isEmpty()) {
+            choice = "Queen"; // Mặc định là Hậu
+        }
+    	switch (choice) {
+        case "Rook":
+            return new Rook(isWhite, row, col);
+        case "Bishop":
+            return new Bishop(isWhite, row, col);
+        case "Knight":
+            return new Knight(isWhite, row, col);
+        case "Queen":
+        default:
+            return new Queen(isWhite, row, col);
+    }
+    	
+    	
+    		
+    }
 }
+
+
+
+
+
+
+
+
