@@ -164,7 +164,12 @@ public class Board {
     		}
     	}
     	return pieces;
-    } 
+    }
+
+	public boolean isGameOver() {
+		
+		return false;
+	} 
 }
 
 
