@@ -22,6 +22,8 @@ public class Board {
     }
 
     private void setupPieces() {
+    	
+    	/*
         // --- Quân trắng ---
         // Hàng 6: Pawn
         for (int col = 0; col < 8; col++) {
@@ -83,9 +85,43 @@ public class Board {
         
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
+        
+        */
+    	
+    	
+        //test chiếu tướng:
+        
+        // --- Quân đen (Black) ---
+
+    	// --- Quân đen (Black) ---
+        
+        // Vua Đen bị cô lập ở góc 
+        board[0][7] = new King(false, 0, 7); // h8
+        board[0][7].loadImage(); 
+        
+        // Tốt đen cản đường thoát của Vua (tùy chọn)
+        board[1][7] = new Pawn(false, 1, 7); // h7
+        board[1][7].loadImage();
+
+        // --- Quân Trắng (White) ---
+        
+        // Hậu Trắng ở e5 - Vị trí để tấn công ô f7
+        board[4][4] = new Queen(true, 4, 4); // e5 
+        board[4][4].loadImage();
+        
+        // Tượng Trắng ở d6 - Kiểm soát g8, ô thoát tiềm năng.
+        board[2][3] = new Bishop(true, 2, 3); // d6
+        board[2][3].loadImage();
+        
+        // Vua Trắng (ở một vị trí an toàn, không tham gia tấn công)
+        board[7][4] = new King(true, 7, 4); // e1
+        board[7][4].loadImage();
+        
+        board[7][6] = new Rook(true, 7, 6); // e1
+        board[7][6].loadImage();
     }
-
-
+    
+    
     public Piece getPiece(int row, int col) {
         if (!isValidPosition(row, col)) return null;
         return board[row][col];
@@ -96,10 +132,13 @@ public class Board {
         moveHistory.add(move);        // lưu lịch sử
     }
 
-    public void undoLastMove() {
-        if (moveHistory.isEmpty()) return;
-        Move lastMove = moveHistory.remove(moveHistory.size() - 1);
-        lastMove.undo(board);
+    public boolean undoLastMove() {
+        if (moveHistory.isEmpty()) return false;
+        else {
+        	Move lastMove = moveHistory.remove(moveHistory.size() - 1);
+            lastMove.undo(board);
+            return true;
+        }
     }
 
     public Piece[][] getBoard() {
