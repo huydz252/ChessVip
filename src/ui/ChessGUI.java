@@ -17,7 +17,7 @@ public class ChessGUI extends JFrame {
     public static final Color COLOR_TEXT = Color.BLACK;
 
     public ChessGUI() {
-        gameController = new GameController();
+        gameController = new GameController(this);
         setTitle("ChessMaster");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout()); // Layout chính là BorderLayout
