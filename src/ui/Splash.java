@@ -26,8 +26,8 @@ public class Splash extends JFrame {
     private JPanel contentPane;
 
     //Định nghĩa màu sắc để dễ quản lý
-    private final Color COLOR_BACKGROUND = new Color(48,46,43); 
-    private final Color COLOR_GREEN = new Color(118, 185, 71); // Xanh lá cây
+    private final Color COLOR_BACKGROUND = new Color(48,46,43);
+    private final Color COLOR_GREEN = new Color(118, 185, 71); 
     private final Color COLOR_WHITE = Color.WHITE;
 
     /**
@@ -54,7 +54,7 @@ public class Splash extends JFrame {
         setBounds(100, 100, 800, 450); 
         setLocationRelativeTo(null); // Căn giữa màn hình
 
-        contentPane = new JPanel(new GridBagLayout()); // SỬA: Dùng GridBagLayout
+        contentPane = new JPanel(new GridBagLayout());
         contentPane.setBackground(COLOR_BACKGROUND);
         setContentPane(contentPane);
 
@@ -70,7 +70,7 @@ public class Splash extends JFrame {
         } catch (Exception e) {
             lblImage.setText("Không tìm thấy ảnh");
             lblImage.setForeground(COLOR_WHITE);
-            System.err.println("Không tìm thấy ảnh /images/splash_art.png");
+            System.err.println("Không tìm thấy ảnh /resources/images/logo.png");
         }
         
         gbc.gridx = 0; // Cột 0
@@ -83,7 +83,7 @@ public class Splash extends JFrame {
 
         // --- CỘT BÊN PHẢI (Text và Nút) ---
         JPanel rightPanel = new JPanel(new GridBagLayout());
-        rightPanel.setOpaque(false); // SỬA: Làm cho panel trong suốt
+        rightPanel.setOpaque(false); // Làm cho panel trong suốt
         GridBagConstraints gbcRight = new GridBagConstraints();
         gbcRight.gridx = 0;
         gbcRight.anchor = GridBagConstraints.WEST; // Căn lề trái

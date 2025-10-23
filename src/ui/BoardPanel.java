@@ -8,31 +8,42 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List; // Sửa import java.util.List
 
 public class BoardPanel extends JPanel {
     private JPanel[][] cells = new JPanel[8][8];
     private GameController gameController;
+    private ChessGUI chessGUI;
 
-    //lấy thông tin ô đc chọn (chưa chọn = -1)
+    // SỬA: Định nghĩa màu sắc cho dễ quản lý
+    private final Color LIGHT_CELL_COLOR = new Color(240, 217, 181); // Màu Tan
+    private final Color DARK_CELL_COLOR = new Color(181, 136, 99);   // Màu Brown
+    private final Color SELECTED_BORDER_COLOR = Color.YELLOW;        // Viền quân được chọn
+    private final Color MOVE_BORDER_COLOR = new Color(0, 220, 0);  // Viền nước đi
+    private final Color CAPTURE_BORDER_COLOR = Color.RED;            // Viền ăn quân
+
     private int selectedRow = -1;
     private int selectedCol = -1;
-    
-    private java.util.List<int[]> highlightCells = new ArrayList<>();
+    private List<int[]> highlightCells = new ArrayList<>(); // Dùng List thay vì java.util.List
 
-    public BoardPanel(GameController gameController) {
+    public BoardPanel(GameController gameController, ChessGUI gui) {
         this.gameController = gameController;
+        this.chessGUI = gui;
+        
         setLayout(new GridLayout(8, 8));
 
-        // Tạo các ô
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                JPanel cell = new JPanel();
-                cell.setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
-                cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                JPanel cell = new JPanel(new BorderLayout()); // SỬA: Dùng BorderLayout để căn giữa JLabel
+                
+                // Dùng màu sắc mới
+                cell.setBackground((row + col) % 2 == 0 ? LIGHT_CELL_COLOR : DARK_CELL_COLOR);
+                
+                //Xóa viền đen mặc định, để updateBoard() toàn quyền xử lý
+                
                 final int r = row;
                 final int c = col;
 
-                // Click listener cho từng ô
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -40,99 +51,137 @@ public class BoardPanel extends JPanel {
                     }
                 });
                 
-                // từng phần tử trong mảng 2 chiều cells lần lượt đc gán bằng 1 cell (JPanel)
                 cells[row][col] = cell;
                 add(cell);
             }
         }
-
-        // Cập nhật ban đầu
         updateBoard();
     }
 
+    /**
+     * SỬA: Cải thiện logic click chuột
+     */
     private void handleClick(int row, int col) {
-    Piece clickedPiece = gameController.getBoard().getPiece(row, col);
+        Piece clickedPiece = gameController.getBoard().getPiece(row, col);
 
-    if (selectedRow == -1 && clickedPiece != null && clickedPiece.isWhite() == gameController.isWhiteTurn()) {
-        // Chọn quân cờ của mình
+        if (selectedRow == -1) {
+            // 1. CHƯA CHỌN GÌ: Thử chọn quân
+            if (clickedPiece != null && clickedPiece.isWhite() == gameController.isWhiteTurn()) {
+                selectPiece(row, col);
+            }
+        } else {
+            // 2. ĐÃ CHỌN QUÂN
+            if (row == selectedRow && col == selectedCol) {
+                // 2a. Click lại quân cũ -> Hủy chọn
+                deselectPiece();
+                updateBoard();
+            } else if (clickedPiece != null && clickedPiece.isWhite() == gameController.isWhiteTurn()) {
+                // 2b. Click quân cùng màu khác -> Đổi lựa chọn
+                selectPiece(row, col); // Tự động hủy chọn cũ và chọn mới
+            } else {
+                // 2c. Click ô trống hoặc quân địch -> Thử di chuyển
+                boolean moved = gameController.move(selectedRow, selectedCol, row, col);
+                String moveNotation = getMoveNotation(selectedRow, selectedCol, row, col); // Lấy ký hiệu
+                
+                deselectPiece(); // Luôn hủy chọn sau khi thử di chuyển
+                
+                if (moved) {
+                    // SỬA: Gọi hàm cập nhật TỔNG của GUI
+                    chessGUI.updateGame(moveNotation, true);
+                    // updateGame() đã bao gồm updateBoard(), không cần gọi lại
+                } else {
+                    // Nước đi không hợp lệ (ví dụ: click ra ngoài),
+                    // chỉ cần vẽ lại bàn cờ để xóa highlight
+                    updateBoard();
+                }
+            }
+        }
+    }
+
+    /**
+     * Hàm helper mới: Chọn một quân cờ
+     */
+    private void selectPiece(int row, int col) {
         selectedRow = row;
         selectedCol = col;
-        cells[row][col].setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
-
-        // Xóa danh sách highlight cũ
         highlightCells.clear();
-
+        
+        Piece piece = gameController.getBoard().getPiece(row, col);
+        if (piece == null) return;
+        
         Piece[][] board = gameController.getBoard().getBoard();
-
-        // Duyệt tất cả ô, check nước đi hợp lệ
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
-                if (clickedPiece.isValidMove(r, c, board)) {
+                // TODO: Nên dùng gameController.isValidMove(...) nếu có,
+                // vì nó kiểm tra cả luật tự chiếu
+                if (piece.isValidMove(r, c, board)) {
                     highlightCells.add(new int[]{r, c});
                 }
             }
         }
+        updateBoard(); // Cập nhật để hiển thị highlight
+    }
 
-        // Vẽ lại bàn cờ với highlight
-        updateBoard();
-
-    } else if (selectedRow != -1) {
-        // Chọn ô đích
-        boolean moved = gameController.move(selectedRow, selectedCol, row, col);
-
-        // Xóa highlight và border
-        highlightCells.clear();
-        cells[selectedRow][selectedCol].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
+    /**
+     * Hàm helper mới: Bỏ chọn
+     */
+    private void deselectPiece() {
         selectedRow = -1;
         selectedCol = -1;
-
-        // Cập nhật bàn cờ
-        updateBoard();
-
-        if (!moved) {
-            // Di chuyển không hợp lệ
-            JOptionPane.showMessageDialog(this, "Invalid move!");
-        }
+        highlightCells.clear();
     }
-}
 
+    /**
+     * Hàm helper mới: Lấy ký hiệu nước đi
+     */
+    private String getMoveNotation(int r1, int c1, int r2, int c2) {
+        // Chuyển đổi tọa độ mảng (0-7, 0-7) sang cờ vua (a1-h8)
+        char fromCol = (char)('a' + c1);
+        int fromRow = 8 - r1;
+        char toCol = (char)('a' + c2);
+        int toRow = 8 - r2;
+        return "" + fromCol + fromRow + " " + toCol + toRow;
+    }
+
+    /**
+     * SỬA: Cập nhật logic vẽ viền (border) và màu sắc
+     */
     public void updateBoard() {
         Piece[][] boardPieces = gameController.getBoard().getBoard();
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 JPanel cell = cells[row][col];
                 cell.removeAll();
+                cell.setBorder(null); // Xóa viền cũ trước
 
-                // --- Set màu nền ---
-                Color baseColor = (row + col) % 2 == 0 ? Color.WHITE : Color.GRAY;
+                // --- 1. Set màu nền ---
+                Color baseColor = (row + col) % 2 == 0 ? LIGHT_CELL_COLOR : DARK_CELL_COLOR;
                 cell.setBackground(baseColor);
 
-                // --- Kiểm tra highlight để set viền ---
+                // --- 2. Kiểm tra highlight (Vẽ viền nước đi) ---
                 boolean isHighlight = false;
-                Color borderColor = Color.BLACK; // default
-
                 for (int[] h : highlightCells) {
                     if (h[0] == row && h[1] == col) {
                         isHighlight = true;
                         Piece targetPiece = boardPieces[row][col];
-                        if (targetPiece != null && targetPiece.isWhite() != boardPieces[selectedRow][selectedCol].isWhite()) {
-                            borderColor = Color.RED;   // ô có quân địch
+                        Color borderColor;
+                        if (targetPiece != null) {
+                            borderColor = CAPTURE_BORDER_COLOR; // ô có quân địch (isValidMove đã check)
                         } else {
-                        	borderColor = new Color(0, 220, 0); // xanh lá đậm  // ô trống hoặc quân cùng màu
+                            borderColor = MOVE_BORDER_COLOR;    // ô trống
                         }
+                        cell.setBorder(BorderFactory.createLineBorder(borderColor, 3));
                         break;
                     }
                 }
 
-                // Nếu ô đang được highlight thì set viền
-                if (isHighlight) {
-                    cell.setBorder(BorderFactory.createLineBorder(borderColor, 3));
-                } else {
-                    cell.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                // --- 3. Vẽ viền quân đang CHỌN (Ưu tiên cao hơn) ---
+                // (Ghi đè viền highlight nếu click lại)
+                if (row == selectedRow && col == selectedCol) {
+                    cell.setBorder(BorderFactory.createLineBorder(SELECTED_BORDER_COLOR, 3));
                 }
-
-                // --- Thêm quân cờ ---
+                
+                // --- 4. Thêm quân cờ (Ảnh) ---
                 Piece piece = boardPieces[row][col];
                 if (piece != null) {
                     ImageIcon icon = piece.getImage();
@@ -140,7 +189,7 @@ public class BoardPanel extends JPanel {
                         JLabel label = new JLabel(icon);
                         label.setHorizontalAlignment(SwingConstants.CENTER);
                         label.setVerticalAlignment(SwingConstants.CENTER);
-                        cell.add(label);
+                        cell.add(label, BorderLayout.CENTER); // SỬA: Căn giữa ảnh
                     } else {
                         System.out.println("ImageIcon is null for piece at " + row + "," + col);
                     }
@@ -151,8 +200,4 @@ public class BoardPanel extends JPanel {
             }
         }
     }
-
-
-
-
 }

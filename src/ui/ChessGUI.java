@@ -3,97 +3,89 @@ package ui;
 import javax.swing.*;
 import logic.GameController;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class ChessGUI extends JFrame {
+
     private GameController gameController;
     private BoardPanel boardPanel;
-    private JLabel turnLabel;  // hiển thị lượt đi
+    private SidebarPanel sidebarPanel;       // Panel mới bên phải
+    private PlayerInfoPanel playerInfoPanel; // Panel mới bên dưới
+
+    // Định nghĩa màu sắc chủ đạo
+    public static final Color COLOR_BACKGROUND = new Color(211, 211, 211);
+    public static final Color COLOR_PANEL = Color.WHITE;
+    public static final Color COLOR_TEXT = Color.BLACK;
 
     public ChessGUI() {
         gameController = new GameController();
-        setTitle("Chess Game");
+        setTitle("ChessMaster");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout()); // Layout chính là BorderLayout
 
-        // Panel menu trên cùng (giữ nguyên)
+        // ----- 1. THANH MENU (NORTH) -----
+        // Giữ nguyên MenuPanel của bạn
         add(new MenuPanel(), BorderLayout.NORTH);
 
-        // Bàn cờ (2/3 trái)
-        boardPanel = new BoardPanel(gameController);
+        // ----- 2. BÀN CỜ (CENTER) -----
+        // SỬA ĐỔI: boardPanel cần một tham chiếu đến ChessGUI để gọi update
+        boardPanel = new BoardPanel(gameController, this);
+        add(boardPanel, BorderLayout.CENTER);
 
-        // Panel bên phải (1/3 phải)
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBorder(BorderFactory.createTitledBorder("Thông tin & Điều khiển"));
-        rightPanel.setPreferredSize(new Dimension(300, 800));
+        // ----- 3. THANH BÊN (EAST) -----
+        // SỬA ĐỔI: Thay thế JPanel cũ bằng SidebarPanel mới
+        sidebarPanel = new SidebarPanel(gameController, this);
+        add(sidebarPanel, BorderLayout.EAST);
 
-        // Thông tin người chơi
-        JLabel playerInfo = new JLabel("<html><b>Người chơi 1:</b> Trắng<br><b>Người chơi 2:</b> Đen</html>");
-        playerInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ----- 4. THANH NGƯỜI CHƠI (SOUTH) -----
+        // SỬA ĐỔI: Thêm panel mới cho thông tin người chơi
+        playerInfoPanel = new PlayerInfoPanel();
+        add(playerInfoPanel, BorderLayout.SOUTH);
 
-        // Nhãn lượt đi
-        turnLabel = new JLabel(gameController.isWhiteTurn() ? "White to move" : "Black to move");
-        turnLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        turnLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
-
-        // Các nút điều khiển
-        JButton btnUndo = new JButton("Undo");
-        JButton btnRestart = new JButton("Restart");
-        JButton btnExit = new JButton("Exit");
-
-        // Căn giữa các nút
-        btnUndo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnRestart.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnExit.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Thêm hành vi Undo
-        btnUndo.addActionListener((ActionEvent e) -> {
-            gameController.undoLastMove();
-            boardPanel.updateBoard();  // vẽ lại bàn cờ
-            turnLabel.setText(gameController.isWhiteTurn() ? "White to move" : "Black to move");
-        });
-
-        // Hành vi Restart
-        btnRestart.addActionListener((ActionEvent e) -> {
-            dispose();          // đóng cửa sổ hiện tại
-            SwingUtilities.invokeLater(ChessGUI::new); // mở lại GUI mới
-        });
-
-        // Hành vi Exit
-        btnExit.addActionListener((ActionEvent e) -> System.exit(0));
-
-        // Thêm vào panel điều khiển
-        rightPanel.add(Box.createVerticalStrut(20));
-        rightPanel.add(playerInfo);
-        rightPanel.add(turnLabel);
-        rightPanel.add(Box.createVerticalStrut(20));
-        rightPanel.add(btnUndo);
-        rightPanel.add(Box.createVerticalStrut(15));
-        rightPanel.add(btnRestart);
-        rightPanel.add(Box.createVerticalStrut(15));
-        rightPanel.add(btnExit);
-        rightPanel.add(Box.createVerticalGlue());
-
-        // Chia layout chính: trái là bàn cờ, phải là panel điều khiển
-        JSplitPane splitPane = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT,
-                boardPanel,
-                rightPanel
-        );
-        splitPane.setDividerLocation(0.67); // 2/3 - 1/3
-        splitPane.setResizeWeight(0.67);
-        splitPane.setDividerSize(4);
-        splitPane.setContinuousLayout(true);
-
-        add(splitPane, BorderLayout.CENTER);
+        // Hoàn thiện Frame
+        getContentPane().setBackground(COLOR_BACKGROUND); // Màu nền cho các khoảng trống
+        pack(); // Tự động điều chỉnh kích thước
+        setMinimumSize(new Dimension(900, 700)); // Đặt kích thước tối thiểu
         setLocationRelativeTo(null);
         setVisible(true);
+
+        // Cập nhật GUI lần đầu
+        updateGame("Bắt đầu ván cờ...", true);
+    }
+
+    /**
+     * Hàm trung tâm để cập nhật toàn bộ GUI sau một nước đi.
+     * Sẽ được gọi bởi BoardPanel sau khi một nước đi thành công.
+     * @param moveNotation Ký hiệu nước đi (ví dụ: "e4")
+     */
+    public void updateGame(String moveNotation, boolean isNewMove) {
+        boardPanel.updateBoard();
+        playerInfoPanel.updateTurn(gameController.isWhiteTurn());
+        
+        // Cập nhật danh sách nước đi
+        if (isNewMove) {
+            sidebarPanel.addMove(moveNotation);
+        } else {
+            // Xử lý cho Undo
+            sidebarPanel.removeLastMove();
+        }
+
+    }
+    
+    /**
+     * Hàm riêng cho nút Restart
+     */
+    public void restartGame() {
+        dispose();
+        SwingUtilities.invokeLater(ChessGUI::new);
     }
 
     public static void main(String[] args) {
+        // Cài đặt Look and Feel cho đẹp hơn 
+        try {
+            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         SwingUtilities.invokeLater(ChessGUI::new);
     }
 }
