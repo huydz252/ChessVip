@@ -91,7 +91,7 @@ public class Splash extends JFrame {
         // SỬA: Thêm 3 dòng text
         Font textFont = new Font("Arial", Font.BOLD, 28);
         
-        JLabel lblLine1 = new JLabel("CỜ VUA 2025");
+        JLabel lblLine1 = new JLabel("ChessMaster");
         lblLine1.setFont(textFont);
         lblLine1.setForeground(COLOR_WHITE);
         gbcRight.gridy = 0;
@@ -123,7 +123,7 @@ public class Splash extends JFrame {
 
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ChessGUI(); 
+                new MainMenu(); 
                 dispose(); 
             }
         });

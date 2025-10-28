@@ -1,8 +1,10 @@
 package ui;
 
 import javax.swing.*;
-import logic.GameController;
 import java.awt.*;
+
+import logic.GameController;
+import logic.GameMode;
 
 public class ChessGUI extends JFrame {
 
@@ -16,39 +18,29 @@ public class ChessGUI extends JFrame {
     public static final Color COLOR_PANEL = Color.WHITE;
     public static final Color COLOR_TEXT = Color.BLACK;
 
-    public ChessGUI() {
-        gameController = new GameController(this);
+    public ChessGUI(GameMode mode) {
+        gameController = new GameController(this, mode);
         setTitle("ChessMaster");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout()); // Layout chính là BorderLayout
+        setLayout(new BorderLayout()); // Layout chính 
 
-        // ----- 1. THANH MENU (NORTH) -----
-        // Giữ nguyên MenuPanel của bạn
         add(new MenuPanel(), BorderLayout.NORTH);
 
-        // ----- 2. BÀN CỜ (CENTER) -----
-        // SỬA ĐỔI: boardPanel cần một tham chiếu đến ChessGUI để gọi update
         boardPanel = new BoardPanel(gameController, this);
         add(boardPanel, BorderLayout.CENTER);
 
-        // ----- 3. THANH BÊN (EAST) -----
-        // SỬA ĐỔI: Thay thế JPanel cũ bằng SidebarPanel mới
         sidebarPanel = new SidebarPanel(gameController, this);
         add(sidebarPanel, BorderLayout.EAST);
 
-        // ----- 4. THANH NGƯỜI CHƠI (SOUTH) -----
-        // SỬA ĐỔI: Thêm panel mới cho thông tin người chơi
         playerInfoPanel = new PlayerInfoPanel();
         add(playerInfoPanel, BorderLayout.SOUTH);
 
-        // Hoàn thiện Frame
-        getContentPane().setBackground(COLOR_BACKGROUND); // Màu nền cho các khoảng trống
-        pack(); // Tự động điều chỉnh kích thước
-        setMinimumSize(new Dimension(900, 700)); // Đặt kích thước tối thiểu
+        getContentPane().setBackground(COLOR_BACKGROUND);
+        pack(); 
+        setMinimumSize(new Dimension(900, 700)); 
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Cập nhật GUI lần đầu
         updateGame("Bắt đầu ván cờ...", true);
     }
 
@@ -71,21 +63,17 @@ public class ChessGUI extends JFrame {
 
     }
     
-    /**
-     * Hàm riêng cho nút Restart
-     */
     public void restartGame() {
         dispose();
-        SwingUtilities.invokeLater(ChessGUI::new);
+        SwingUtilities.invokeLater(MainMenu::new);
     }
 
     public static void main(String[] args) {
-        // Cài đặt Look and Feel cho đẹp hơn 
         try {
-            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        SwingUtilities.invokeLater(ChessGUI::new);
+        SwingUtilities.invokeLater(MainMenu::new);
     }
 }
