@@ -71,7 +71,7 @@ public class SidebarPanel extends JPanel {
         buttonPanel.setOpaque(false); // Trong suốt
 
         JButton btnUndo = createStyledButton("Undo");
-        JButton btnRestart = createStyledButton("Restart");
+        JButton btnRestart = createStyledButton("Menu");
         JButton btnResign = createStyledButton("Đầu hàng");
         JButton btnHint = createStyledButton("Gợi ý");
 

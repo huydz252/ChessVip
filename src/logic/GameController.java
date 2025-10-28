@@ -1,7 +1,6 @@
 package logic;
 
 import java.util.List;
-
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker; 
 
@@ -16,23 +15,34 @@ import logic.pieces.Queen;
 import logic.pieces.Rook;
 import logic.move.Move;
 import ui.ChessGUI;
+import logic.GameMode;
 
 public class GameController {
 	private Board board;
     private boolean whiteTurn;
-    private ChessAI chessAI;
+    private ChessAI chessAI;		//null nếu chơi PvP
     private ChessGUI chessGUI;
-
-    // SỬA: Constructor chính, cần tham chiếu GUI
-    public GameController(ChessGUI gui) { 
-        this.chessGUI = gui;
+    private GameMode gameMode;
+    
+    
+    public GameController(ChessGUI gui, GameMode mode) { 
         board = new Board();
         whiteTurn = true;
         chessAI = new ChessAI(this);
+        this.chessGUI = gui;
+        this.gameMode = mode;
+        
+        //kiểm tra chế độ chơi (set ch)
+        if (this.gameMode == GameMode.PLAYER_VS_AI) {
+            chessAI = new ChessAI(this);
+        } else {
+            chessAI = null;
+        }
     }
     
+    //constructer phụ: mặc định là AI
     public GameController() {
-        this(null); // Gọi constructor chính với tham chiếu GUI là null
+        this(null, GameMode.PLAYER_VS_AI); 
     }
     
     public boolean isWhiteTurn() {
@@ -222,8 +232,8 @@ public class GameController {
     // AI
     
     public void handleAITurn() {
-        // KIỂM TRA: Chỉ xử lý nếu GUI đã được gán và đến lượt Đen
-        if (chessGUI == null || whiteTurn) return; 
+        // KIỂM TRA: Chỉ xử lý nếu GUI đã được gán và đến lượt Đen, và có AI
+        if (chessGUI == null || whiteTurn || chessAI == null) return; 
 
         new SwingWorker<Move, Void>() {
             
