@@ -1,8 +1,10 @@
 package logic.pieces;
 
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 
-public class Queen extends Piece {
+public class Queen extends Piece implements Serializable{
 
     public Queen(boolean isWhite, int row, int col) {
         super(isWhite, row, col);

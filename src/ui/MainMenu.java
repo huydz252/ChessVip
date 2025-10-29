@@ -68,14 +68,41 @@ public class MainMenu extends JFrame {
         pvaiButton.addActionListener(e -> startGame(GameMode.PLAYER_VS_AI));
         
         pvpButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chức năng (PvP) đang được phát triển!");
-            // Khi sẵn sàng, hãy dùng dòng này:
-            // startGame(GameMode.PLAYER_VS_PLAYER);
+        	// 1. Tạo các nút lựa chọn
+            String[] options = {"Host (Tạo phòng)", "Join (Vào phòng)"};
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Bạn muốn làm chủ phòng hay tham gia?",
+                    "Chơi với bạn (PvP)",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, // (Không dùng icon tùy chỉnh)
+                    options,
+                    options[0]); // (Mặc định chọn Host)
+
+            if (choice == JOptionPane.YES_OPTION) { // 0 = Host
+                // Gọi hàm startGame mới với vai trò là Host
+                startGame(GameMode.PLAYER_VS_PLAYER, 0, null);
+                
+            } else if (choice == JOptionPane.NO_OPTION) { // 1 = Join
+                // Yêu cầu nhập IP
+                String ip = JOptionPane.showInputDialog(
+                        this, 
+                        "Nhập địa chỉ IP của Host:",
+                        "Vào phòng",
+                        JOptionPane.PLAIN_MESSAGE
+                );
+                
+                if (ip != null && !ip.trim().isEmpty()) {
+                    // Gọi hàm startGame mới với vai trò là Join và kèm IP
+                    startGame(GameMode.PLAYER_VS_PLAYER, 1, ip.trim());
+                }
+                // (Nếu người dùng hủy, không làm gì cả)
+            }
         });
         
         exitButton.addActionListener(e -> System.exit(0));
 
-        // Hiển thị
         setVisible(true);
     }
 
@@ -142,13 +169,32 @@ public class MainMenu extends JFrame {
     /**
      * Đóng Menu và mở ChessGUI với chế độ đã chọn. (Giữ nguyên)
      */
-    private void startGame(GameMode mode) {
+    private void startGame(GameMode mode, int pvpRole, String ip) {
         dispose();
-        SwingUtilities.invokeLater(() -> new ChessGUI(mode));
+     // Dùng lambda để truyền tham số vào ChessGUI
+        SwingUtilities.invokeLater(() -> {
+            ChessGUI gui = new ChessGUI(mode);
+            
+            // Nếu là PvP, báo cho ChessGUI biết vai trò
+            if (mode == GameMode.PLAYER_VS_PLAYER) {
+                if (pvpRole == 0) { // Host
+                    gui.startHostGame();
+                } else if (pvpRole == 1) { // Join
+                    gui.startJoinGame(ip);
+                }
+            }
+            
+            // (Hiển thị GUI - đã có trong constructor của ChessGUI)
+        });
+    }
+    
+    private void startGame(GameMode mode) {
+        // Gọi hàm mới với tham số mặc định - AI
+        startGame(mode, -1, null); 
     }
 
     /**
-     * Lớp nội (inner class) để làm Panel nền (Giữ nguyên)
+     *(inner class) làm Panel nền 
      */
     class MenuBackgroundPanel extends JPanel {
         private Image backgroundImage;

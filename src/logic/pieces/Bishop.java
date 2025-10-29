@@ -1,8 +1,10 @@
 package logic.pieces;
 
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 
-public class Bishop extends Piece {
+public class Bishop extends Piece implements Serializable{
 
     public Bishop(boolean isWhite, int row, int col) {
         super(isWhite, row, col);

@@ -15,26 +15,30 @@ import logic.pieces.Queen;
 import logic.pieces.Rook;
 import logic.move.Move;
 import ui.ChessGUI;
-import logic.GameMode;
+import network.NetworkManager;
 
 public class GameController {
+	
 	private Board board;
     private boolean whiteTurn;
     private ChessAI chessAI;		//null nếu chơi PvP
     private ChessGUI chessGUI;
     private GameMode gameMode;
+    private NetworkManager networkManager;
+    
+    private boolean isClientWhite = true;
     
     
     public GameController(ChessGUI gui, GameMode mode) { 
         board = new Board();
         whiteTurn = true;
-        chessAI = new ChessAI(this);
         this.chessGUI = gui;
         this.gameMode = mode;
         
         //kiểm tra chế độ chơi (set ch)
         if (this.gameMode == GameMode.PLAYER_VS_AI) {
             chessAI = new ChessAI(this);
+            isClientWhite = true;
         } else {
             chessAI = null;
         }
@@ -45,24 +49,52 @@ public class GameController {
         this(null, GameMode.PLAYER_VS_AI); 
     }
     
+    
     public boolean isWhiteTurn() {
         return whiteTurn;
+    }
+    
+    public void setNetworkManager(NetworkManager manager) {
+        this.networkManager = manager;
+    }
+    
+    public void setClientColor(boolean isWhite) {
+        this.isClientWhite = isWhite;
+     // BÁO CHO GUI LẬT BÀN CỜ
+        if (!isWhite && chessGUI != null) {
+            chessGUI.flipBoard();
+        }
+    }
+    
+    public boolean isClientTurn() {
+        // Nếu chơi AI, người chơi (Trắng) chỉ click được khi whiteTurn = true
+        if (gameMode == GameMode.PLAYER_VS_AI) {
+            return whiteTurn;
+        }
+        
+        // Nếu chơi PvP, client chỉ click được khi lượt chơi khớp với màu của client
+        return (whiteTurn == isClientWhite); 
+    }
+    
+    //giúp BoardPanel biết máy nào đang chơi quân màu gì (để lật bàn)
+    public boolean isClientWhite() {
+        return this.isClientWhite;
     }
 
     public boolean move(int fromRow, int fromCol, int toRow, int toCol) {
         Piece piece = board.getPiece(fromRow, fromCol);
 
-        // --- 1. Kiểm tra cơ bản ---
+   
         if (piece == null || piece.isWhite() != whiteTurn) return false;
         if (!piece.isValidMove(toRow, toCol, board.getBoard())) return false;
 
-        // --- 2. Tạo nước đi và Thực hiện ---
+        //Tạo nước đi và Thực hiện ---
         Piece captured = board.getPiece(toRow, toCol);
         Move move = new Move(piece, toRow, toCol, captured);
         
         board.executeMove(move); // Thực hiện nước đi trên bàn cờ
 
-        // --- 3. Kiểm tra luật Tự chiếu (Check) ---
+        //Kiểm tra luật tự chiếu
         boolean leaveInCheck = isCheck(piece.isWhite());
 
         if (leaveInCheck) {
@@ -70,14 +102,17 @@ public class GameController {
             return false;
         }
 
-        // --- 4. Xử lý Phong cấp (Promotion) ---
+        //Phong cấp (Promotion) 
         if(isPawnPromotion(piece, toRow)) {
         	Piece promotedPiece = promotePawn(piece.isWhite(), toRow, toCol);
         	board.getBoard()[toRow][toCol] = promotedPiece;
         	promotedPiece.loadImage();
         }
+        
+        if (gameMode == GameMode.PLAYER_VS_PLAYER && networkManager != null) {
+            networkManager.sendMove(move);
+        }
 
-        // --- 5. Đổi lượt và Kiểm tra đối thủ ---
         whiteTurn = !whiteTurn;
 
         if (isCheck(whiteTurn)) { 
@@ -282,4 +317,70 @@ public class GameController {
             }
         }.execute(); 
     }
+    
+    
+    public void applyNetworkMove(Move move) {
+        // Lấy thông tin từ đối tượng Move đã được gửi qua
+        int fromRow = move.getFromRow();
+        int fromCol = move.getFromCol();
+        int toRow = move.getToRow();
+        int toCol = move.getToCol();
+
+        // Lấy quân cờ THỰC TẾ trên bàn cờ của client NÀY
+        Piece pieceToMove = board.getPiece(fromRow, fromCol);
+        
+        // Kiểm tra xem quân cờ có tồn tại không (để tránh lỗi)
+        if (pieceToMove == null) {
+            System.err.println("Lỗi đồng bộ mạng: Không tìm thấy quân cờ tại " + fromRow + "," + fromCol);
+            return;
+        }
+
+        // Tạo lại một đối tượng Move "cục bộ"
+        // (Vì đối tượng 'piece' trong 'move' nhận được không còn là tham chiếu gốc)
+        Piece captured = board.getPiece(toRow, toCol);
+        Move localMove = new Move(pieceToMove, toRow, toCol, captured);
+
+        // Thực hiện nước đi trên bàn cờ
+        board.executeMove(localMove);
+        
+        // Xử lý phong cấp (nếu có)
+        if(isPawnPromotion(pieceToMove, toRow)) {
+            // Khi nhận nước đi từ mạng, chúng ta không thể hiện hộp thoại
+            // lựa chọn cho đối thủ.
+            // GIẢ ĐỊNH: Nước đi phong cấp qua mạng LUÔN LÀ HẬU (Queen).
+            // (Một cải tiến sau này là gửi cả thông tin quân được phong cấp)
+            Piece promotedPiece = new logic.pieces.Queen(pieceToMove.isWhite(), toRow, toCol);
+            board.getBoard()[toRow][toCol] = promotedPiece;
+            promotedPiece.loadImage();
+        }
+        
+        // Đổi lượt (quay về cho client này)
+        whiteTurn = !whiteTurn;
+        
+        // Cập nhật GUI
+        String moveNotation = (char)('a' + fromCol) + String.valueOf(8 - fromRow) + " " + 
+                              (char)('a' + toCol) + String.valueOf(8 - toRow);
+        
+        // chessGUI có thể là null nếu đang chạy test, nên kiểm tra
+        if (chessGUI != null) {
+             chessGUI.updateGame(moveNotation, true);
+        }
+        
+        // Kiểm tra xem nước đi của đối thủ có Chiếu mình không
+        if (isCheck(whiteTurn)) { 
+             System.out.println("Check!");
+             if (isCheckMate(whiteTurn)) {
+                 String winner = whiteTurn ? "Đen" : "Trắng";
+                 String message = "Checkmate!! End game. Người chiến thắng: " + winner;
+                 
+                 if (chessGUI != null) {
+                     JOptionPane.showMessageDialog(
+                         chessGUI, message, "Chiếu Hết!",
+                         JOptionPane.INFORMATION_MESSAGE
+                     );
+                 }
+             }
+        }
+    }
+    
 }

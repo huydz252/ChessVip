@@ -1,8 +1,10 @@
 package logic.pieces;
 
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 
-public abstract class Piece {
+public abstract class Piece implements Serializable{
 	protected Boolean isWhite;
 	protected int row, col;
 	protected ImageIcon image;
