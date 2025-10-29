@@ -1,10 +1,11 @@
 package logic.pieces;
 
+import java.io.Serializable;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
 
-public class Knight extends Piece{
+public class Knight extends Piece implements Serializable{
 	public Knight(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }

@@ -15,7 +15,7 @@ public class BoardPanel extends JPanel {
     private JPanel[][] cells = new JPanel[8][8];
     private GameController gameController;
     private ChessGUI chessGUI;
-
+    
     // Định nghĩa màu sắc cho theme Chess.com (Đã dùng trong code trước)
     private final Color LIGHT_CELL_COLOR = new Color(240, 217, 181); // Màu Tan
     private final Color DARK_CELL_COLOR = new Color(181, 136, 99);   // Màu Brown
@@ -41,23 +41,40 @@ public class BoardPanel extends JPanel {
                 // Set màu ô cờ
                 cell.setBackground((row + col) % 2 == 0 ? LIGHT_CELL_COLOR : DARK_CELL_COLOR);
                 
+                //toạ độ
                 final int r = row;
                 final int c = col;
 
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // CHỈ cho phép người chơi (Trắng) click
-                        if (gameController.isWhiteTurn()) { 
+                    	//kiểm tra lượt
+                    	if (gameController.isClientTurn()) { 
                             handleClick(r, c);
                         }
                     }
                 });
                 
                 cells[row][col] = cell;
-                add(cell);
             }
         }
+        
+        if(gameController.isClientWhite()) {
+        	//trắng
+        	for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    add(cells[r][c]); // A8 (0,0) ở trên cùng
+                }
+            }
+        }else {
+        	//đen
+        	for (int r = 7; r >= 0; r--) {			// Hàng 7 ở trên cùng
+                for (int c = 7; c >= 0; c--) { 		// Cột 7 ở bên trái
+                    add(cells[r][c]); 				
+                }
+            }
+        }
+        
         updateBoard();
     }
 
@@ -166,6 +183,32 @@ public class BoardPanel extends JPanel {
         char toCol = (char)('a' + c2);
         int toRow = 8 - r2;
         return "" + fromCol + fromRow + " " + toCol + toRow;
+    }
+    
+    public void flipBoard() {
+        // 1. Xóa tất cả các ô đã thêm
+        this.removeAll(); 
+
+        // 2. Chạy lại logic add
+        if(gameController.isClientWhite()) {
+            //trắng
+            for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    add(cells[r][c]); 
+                }
+            }
+        }else {
+            //đen
+            for (int r = 7; r >= 0; r--) {
+                for (int c = 7; c >= 0; c--) { 
+                    add(cells[r][c]); 				
+                }
+            }
+        }
+
+        // 3. Yêu cầu Panel vẽ lại
+        this.revalidate();
+        this.repaint();
     }
 
     /**

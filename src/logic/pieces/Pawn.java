@@ -1,8 +1,10 @@
 package logic.pieces;
 
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 
-public class Pawn extends Piece {
+public class Pawn extends Piece implements Serializable{
 	public Pawn(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }

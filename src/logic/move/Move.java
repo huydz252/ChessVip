@@ -1,11 +1,13 @@
 package logic.move;
+import java.io.Serializable;
+
 import logic.pieces.Piece;
 
-public class Move {
-	private Piece piece; // Quân cờ được di chuyển (nên dùng biến này)
-    private int fromRow, fromCol; // Tọa độ cũ
-    private int toRow, toCol;     // Tọa độ mới
-    private Piece captured;       // Quân bị ăn
+public class Move implements Serializable{
+	private Piece piece; 
+    private int fromRow, fromCol; 
+    private int toRow, toCol;    
+    private Piece captured;       
 
     public Move(Piece piece, int toRow, int toCol, Piece captured) {
         this.piece = piece;
@@ -17,7 +19,6 @@ public class Move {
     }
     
 
- // --- Getters Cần thiết (giữ lại và làm private) ---
     public Piece getPiece() { return piece; }
     public int getFromRow() { return fromRow; }
     public int getFromCol() { return fromCol; }
@@ -26,15 +27,12 @@ public class Move {
     public Piece getCaptured() { return captured; }
 
 
-
-    // Thực hiện nước đi
     public void execute(Piece[][] board) {
         board[toRow][toCol] = piece;    
         board[fromRow][fromCol] = null;  
         piece.setPosition(toRow, toCol); 
     }
 
-    // Undo 
     public void undo(Piece[][] board) {
         board[fromRow][fromCol] = piece;
         board[toRow][toCol] = captured;
