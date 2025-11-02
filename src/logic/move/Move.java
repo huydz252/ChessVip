@@ -4,6 +4,9 @@ import java.io.Serializable;
 import logic.pieces.Piece;
 
 public class Move implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	
 	private Piece piece; 
     private int fromRow, fromCol; 
     private int toRow, toCol;    

@@ -1,10 +1,6 @@
 package logic.board;
 
-import logic.pieces.Rook;
 import logic.pieces.King;
-import logic.pieces.Knight;
-import logic.pieces.Pawn;
-import logic.pieces.Bishop;
 import logic.pieces.Queen;
 import logic.pieces.Piece;
 import logic.move.Move;   // nhớ import class Move
@@ -24,6 +20,7 @@ public class Board {
     private void setupPieces() {
     	
     	
+    	/*
         // --- Quân trắng ---
         // Hàng 6: Pawn
         for (int col = 0; col < 8; col++) {
@@ -86,7 +83,7 @@ public class Board {
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
         
-        
+        */
     	
     	
         //test chiếu tướng:
@@ -118,6 +115,33 @@ public class Board {
         board[7][6].loadImage();
         
         */
+        
+        
+        
+        // --- TEST HÒA CỜ (STALEMATE) ---
+        // Kịch bản: Trắng đi 1 nước (Hậu c6 -> b6) sẽ dẫn đến hòa cờ.
+        
+        // --- Quân Đen ---
+        // Vua Đen ở góc a8
+        board[0][0] = new King(false, 0, 0); // a8
+        board[0][0].loadImage(); 
+        
+        // --- Quân Trắng ---
+        
+        // Vua Trắng ở c7, kiểm soát ô b7 và b8
+        board[1][2] = new King(true, 1, 2); // c7
+        board[1][2].loadImage();
+        
+        // Hậu Trắng ở c6, CHUẨN BỊ di chuyển đến b6
+        board[2][2] = new Queen(true, 2, 2); // c6
+        board[2][2].loadImage();
+        
+        // MỤC TIÊU: Bạn (Trắng) di chuyển Hậu từ c6 -> b6.
+        // Sau nước đi đó:
+        // 1. Vua Đen (a8) KHÔNG bị chiếu.
+        // 2. Các ô Vua Đen có thể đi (a7, b7, b8) đều bị Hậu (b6) và Vua (c7) kiểm soát.
+        // -> HÒA CỜ (Stalemate).
+        
     }
     
     

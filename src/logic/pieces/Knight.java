@@ -6,6 +6,11 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 public class Knight extends Piece implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public Knight(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }

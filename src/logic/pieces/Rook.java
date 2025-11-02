@@ -1,13 +1,17 @@
 package logic.pieces;
 
 import java.io.Serializable;
-
-import javax.print.DocFlavor.URL;
 import javax.swing.ImageIcon;
 
 public class Rook extends Piece implements Serializable{
 
-    public Rook(boolean isWhite, int row, int col) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+	public Rook(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }
 

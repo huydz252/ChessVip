@@ -12,43 +12,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoardPanel extends JPanel {
-    private JPanel[][] cells = new JPanel[8][8];
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private JPanel[][] cells = new JPanel[8][8];
     private GameController gameController;
-    private ChessGUI chessGUI;
+    private IGameGUI gui;
     
-    // Định nghĩa màu sắc cho theme Chess.com (Đã dùng trong code trước)
-    private final Color LIGHT_CELL_COLOR = new Color(240, 217, 181); // Màu Tan
-    private final Color DARK_CELL_COLOR = new Color(181, 136, 99);   // Màu Brown
-    private final Color SELECTED_BORDER_COLOR = Color.YELLOW;        // Viền quân được chọn
-    private final Color MOVE_BORDER_COLOR = new Color(0, 220, 0);  // Viền nước đi
-    private final Color CAPTURE_BORDER_COLOR = Color.RED;            // Viền ăn quân
+    private final Color LIGHT_CELL_COLOR = new Color(240, 217, 181); 
+    private final Color DARK_CELL_COLOR = new Color(181, 136, 99);   
+    private final Color SELECTED_BORDER_COLOR = Color.YELLOW;        
+    private final Color MOVE_BORDER_COLOR = new Color(0, 220, 0);  
+    private final Color CAPTURE_BORDER_COLOR = Color.RED;            
 
     private int selectedRow = -1;
     private int selectedCol = -1;
     private List<int[]> highlightCells = new ArrayList<>(); 
 
-    public BoardPanel(GameController gameController, ChessGUI gui) {
+    public BoardPanel(GameController gameController, IGameGUI gui) {
         this.gameController = gameController;
-        this.chessGUI = gui;
+        this.gui = gui;
         
         setLayout(new GridLayout(8, 8));
 
-        // Khởi tạo các ô và MouseListener
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 JPanel cell = new JPanel(new BorderLayout()); 
                 
-                // Set màu ô cờ
                 cell.setBackground((row + col) % 2 == 0 ? LIGHT_CELL_COLOR : DARK_CELL_COLOR);
                 
-                //toạ độ
                 final int r = row;
                 final int c = col;
 
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                    	//kiểm tra lượt
                     	if (gameController.isClientTurn()) { 
                             handleClick(r, c);
                         }
@@ -85,36 +85,27 @@ public class BoardPanel extends JPanel {
         Piece clickedPiece = gameController.getBoard().getPiece(row, col);
 
         if (selectedRow == -1) {
-            // 1. CHƯA CHỌN GÌ: Thử chọn quân Trắng
             if (clickedPiece != null && clickedPiece.isWhite() == gameController.isWhiteTurn()) {
                 selectPiece(row, col);
             }
         } else {
-            // 2. ĐÃ CHỌN QUÂN
             if (row == selectedRow && col == selectedCol) {
-                // 2a. Click lại quân cũ -> Hủy chọn
                 deselectPiece();
                 updateBoard();
             } else if (clickedPiece != null && clickedPiece.isWhite() == gameController.isWhiteTurn()) {
-                // 2b. Click quân cùng màu khác -> Đổi lựa chọn
-                selectPiece(row, col); // Tự động hủy chọn cũ và chọn mới
+                selectPiece(row, col); 
             } else {
-                // 2c. Click ô đích -> Thử di chuyển
                 
-                // --- THỰC HIỆN NƯỚC ĐI CỦA NGƯỜI CHƠI ---
                 boolean moved = gameController.move(selectedRow, selectedCol, row, col);
                 String moveNotation = getMoveNotation(selectedRow, selectedCol, row, col); 
                 
-                deselectPiece(); // Luôn hủy chọn sau khi thử di chuyển
+                deselectPiece(); 
                 
                 if (moved) {
-                    // 1. Cập nhật GUI cho lượt đi của người chơi (Trắng)
-                    chessGUI.updateGame(moveNotation, true);
+                    gui.updateGame(moveNotation, true);
                     
-                    // 2. KÍCH HOẠT LƯỢT ĐI CỦA AI (Đen) - Quan trọng!
                     gameController.handleAITurn(); 
                 } else {
-                    // Nước đi không hợp lệ
                     updateBoard(); 
                 }
             }
@@ -125,7 +116,6 @@ public class BoardPanel extends JPanel {
      * Chọn một quân cờ và tìm nước đi hợp lệ.
      */
     private void selectPiece(int row, int col) {
-        // Hủy chọn cũ nếu có
         if (selectedRow != -1) {
              cells[selectedRow][selectedCol].setBorder(null); // Xóa viền cũ
         }
@@ -143,21 +133,15 @@ public class BoardPanel extends JPanel {
             for (int c = 0; c < 8; c++) {
                 if (piece.isValidMove(r, c, board)) {
                     
-                    // SỬA: Dùng logic của GameController để kiểm tra
-                    
-                    // 1. Tạo nước đi giả lập
                     Piece captured = board[r][c];
                     Move testMove = new Move(piece, r, c, captured);
 
-                    // 2. Thực hiện
                     gameController.getBoard().executeMove(testMove);
                     
-                    // 3. Kiểm tra
                     if (!gameController.isCheck(piece.isWhite())) {
                         highlightCells.add(new int[]{r, c});
                     }
 
-                    // 4. Hoàn tác
                     gameController.getBoard().undoLastMove();
                 }
             }
@@ -186,10 +170,8 @@ public class BoardPanel extends JPanel {
     }
     
     public void flipBoard() {
-        // 1. Xóa tất cả các ô đã thêm
         this.removeAll(); 
 
-        // 2. Chạy lại logic add
         if(gameController.isClientWhite()) {
             //trắng
             for (int r = 0; r < 8; r++) {
@@ -206,7 +188,7 @@ public class BoardPanel extends JPanel {
             }
         }
 
-        // 3. Yêu cầu Panel vẽ lại
+        //Yêu cầu Panel vẽ lại
         this.revalidate();
         this.repaint();
     }
@@ -220,17 +202,13 @@ public class BoardPanel extends JPanel {
             for (int col = 0; col < 8; col++) {
                 JPanel cell = cells[row][col];
                 cell.removeAll();
-                cell.setBorder(null); // Xóa viền cũ trước
+                cell.setBorder(null); 
 
-                // --- 1. Set màu nền ---
                 Color baseColor = (row + col) % 2 == 0 ? LIGHT_CELL_COLOR : DARK_CELL_COLOR;
                 cell.setBackground(baseColor);
 
-                // --- 2. Kiểm tra highlight (Vẽ viền nước đi) ---
-                boolean isHighlight = false;
                 for (int[] h : highlightCells) {
                     if (h[0] == row && h[1] == col) {
-                        isHighlight = true;
                         Piece targetPiece = boardPieces[row][col];
                         Color borderColor = (targetPiece != null) ? CAPTURE_BORDER_COLOR : MOVE_BORDER_COLOR;
                         cell.setBorder(BorderFactory.createLineBorder(borderColor, 3));
@@ -238,12 +216,10 @@ public class BoardPanel extends JPanel {
                     }
                 }
 
-                // --- 3. Vẽ viền quân đang CHỌN (Ưu tiên cao hơn) ---
                 if (row == selectedRow && col == selectedCol) {
                     cell.setBorder(BorderFactory.createLineBorder(SELECTED_BORDER_COLOR, 3));
                 }
                 
-                // --- 4. Thêm quân cờ (Ảnh) ---
                 Piece piece = boardPieces[row][col];
                 if (piece != null) {
                     ImageIcon icon = piece.getImage();

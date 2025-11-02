@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class ChessAI {
 
     private final GameController gameController;
-    private final int MAX_DEPTH = 3; // Độ sâu tìm kiếm
+    private final int MAX_DEPTH = 3; 
 
     public ChessAI(GameController gc) {
         this.gameController = gc;
@@ -22,7 +22,6 @@ public class ChessAI {
     public Move findBestMove() {
         long startTime = System.currentTimeMillis();
         
-        // AI là quân Đen (false)
         boolean isAIMoving = false; 
         
         Move bestMove = null;
@@ -34,7 +33,6 @@ public class ChessAI {
              return null; 
         }
 
-        // --- BẮT ĐẦU THUẬT TOÁN MINIMAX ---
         for (Move move : legalMoves) {
             
             gameController.getBoard().executeMove(move);
@@ -59,16 +57,15 @@ public class ChessAI {
      * Triển khai Minimax với Alpha-Beta Pruning
      */
     private double minimax(int depth, double alpha, double beta, boolean isMaximizingPlayer) {
-        // --- 1. Điều kiện Dừng ---
+        //Điều kiện Dừng
         if (depth == 0 || gameController.getBoard().isGameOver()) { 
-            // GỌI HÀM STATIC TỪ CLASS EVALUATION ĐÃ CHUYỂN
             return Evaluation.evaluateBoard(gameController.getBoard().getBoard());
         }
         
-        // --- 2. Tạo nước đi hợp lệ ---
-        List<Move> legalMoves = generateAllLegalMoves(isMaximizingPlayer);
+        //Tạo nước đi hợp lệ 
+        List<Move> legalMoves = generateAllLegalMoves(!isMaximizingPlayer);
 
-        // --- 3. Kiểm tra Stalemate/Checkmate ---
+        // Kiểm tra Stalemate/Checkmate
         if (legalMoves.isEmpty()) {
              if (gameController.isCheck(isMaximizingPlayer)) {
                  // Checkmate: Trả về giá trị cực đại/cực tiểu tùy theo phe
@@ -79,7 +76,7 @@ public class ChessAI {
              }
         }
         
-        // --- 4. Logic MAX (AI - Đen) ---
+        // Logic MAX (AI - Đen) 
         if (isMaximizingPlayer) {
             double maxEval = Double.NEGATIVE_INFINITY;
             for (Move move : legalMoves) {
@@ -96,7 +93,7 @@ public class ChessAI {
             return maxEval;
         } 
         
-        // --- 5. Logic MIN (Người chơi - Trắng) ---
+        // Logic MIN (Người chơi - Trắng) 
         else {
             double minEval = Double.POSITIVE_INFINITY;
             for (Move move : legalMoves) {
@@ -135,25 +132,20 @@ public class ChessAI {
                                 
                                 Piece captured = board[r2][c2];
                                 
-                                int oldR = piece.getRow(); // (Lưu r1)
-                                int oldC = piece.getCol(); // (Lưu c1)
+                                int oldR = piece.getRow(); 
+                                int oldC = piece.getCol(); 
                                 
-                                // Giả lập nước đi
                                 board[r1][c1] = null;
                                 board[r2][c2] = piece;
                                 piece.setPosition(r2, c2); 
                                 
-                                // Kiểm tra luật Tự chiếu (Vua không bị chiếu sau nước đi)
                                 boolean isLegal = !gameController.isCheck(isWhite);
 
-                                // SỬA LỖI: Hoàn tác giả lập NGAY LẬP TỨC
                                 piece.setPosition(oldR, oldC); // (Đặt lại vị trí piece về r1, c1)
                                 board[r1][c1] = piece;
                                 board[r2][c2] = captured;
                                 
-                                // SỬA LỖI: Chỉ tạo Move SAU KHI đã hoàn tác
                                 if (isLegal) {
-                                    // Bây giờ piece.getRow() là r1, chính xác!
                                     allMoves.add(new Move(piece, r2, c2, captured)); 
                                 }
                             }
