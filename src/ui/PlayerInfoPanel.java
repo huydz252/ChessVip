@@ -1,21 +1,24 @@
 package ui;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class PlayerInfoPanel extends JPanel {
 
-    private JLabel playerNameLabel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JLabel playerNameLabel;
     private JLabel turnLabel;
     private JLabel materialLabel;
 
     public PlayerInfoPanel() {
         setBackground(ChessGUI.COLOR_PANEL);
-        setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10)); // Căn trái
+        setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10)); 
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY)); // Viền trên
 
-        // (Thêm avatar của bạn ở đây)
+        // (Thêm avatar ở đây)
         
         playerNameLabel = new JLabel("Chơi ẩn danh");
         playerNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -25,18 +28,16 @@ public class PlayerInfoPanel extends JPanel {
         // Nhãn lượt đi
         turnLabel = new JLabel("Trắng đi");
         turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        turnLabel.setForeground(Color.RED); // Nổi bật
+        turnLabel.setForeground(Color.RED); 
         add(turnLabel);
 
        
     }
 
-    // Được gọi từ ChessGUI
     public void updateTurn(boolean isWhiteTurn) {
         turnLabel.setText(isWhiteTurn ? "Lượt Trắng" : "Lượt Đen");
     }
 
-    // Được gọi từ ChessGUI
     public void updateMaterial(int materialAdvantage) {
         if (materialAdvantage > 0) {
             materialLabel.setText("+" + materialAdvantage);

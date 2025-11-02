@@ -2,7 +2,6 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.InetAddress;
 
 import logic.GameController;
 import logic.GameMode;

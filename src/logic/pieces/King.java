@@ -7,7 +7,12 @@ import javax.swing.ImageIcon;
 
 public class King extends Piece implements Serializable{
 
-    public King(boolean isWhite, int row, int col) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public King(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }
 

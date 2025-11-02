@@ -8,7 +8,12 @@ import logic.GameMode; // Import GameMode
 
 public class MainMenu extends JFrame {
 
-    private static final int MENU_WIDTH = 800;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private static final int MENU_WIDTH = 800;
     private static final int MENU_HEIGHT = 600;
 
     private static final int ICON_SIZE = 40; 
@@ -46,10 +51,10 @@ public class MainMenu extends JFrame {
         JButton exitButton = createStyledButton("Thoát", "icon_exit.png");
         
         mainPanel.add(titleLabel, gbc);
-        mainPanel.add(tutorialButton, gbc); // Nút Hướng dẫn
-        mainPanel.add(pvaiButton, gbc);     // Nút Chơi vs AI
-        mainPanel.add(pvpButton, gbc);      // Nút Chơi vs Bạn
-        mainPanel.add(exitButton, gbc);     // Nút Thoát
+        mainPanel.add(tutorialButton, gbc); 
+        mainPanel.add(pvaiButton, gbc);     
+        mainPanel.add(pvpButton, gbc);      
+        mainPanel.add(exitButton, gbc);     
 
         add(mainPanel);
 
@@ -85,7 +90,7 @@ public class MainMenu extends JFrame {
                 if (ip != null && !ip.trim().isEmpty()) {
                     startGame(GameMode.PLAYER_VS_PLAYER, 1, ip.trim());
                 }
-                // Nếu người dùng hủy, không làm gì cả
+                // Nếu hủy, không làm gì cả
             }
         });
         
@@ -114,8 +119,8 @@ public class MainMenu extends JFrame {
         
         JButton button = new JButton(text, icon);
         
-        button.setHorizontalAlignment(SwingConstants.LEFT); // Căn icon và text về bên trái
-        button.setIconTextGap(25); // Khoảng cách giữa icon và text
+        button.setHorizontalAlignment(SwingConstants.LEFT); 
+        button.setIconTextGap(25); 
         
         button.setFont(new Font("Arial", Font.BOLD, 22));
         button.setForeground(COLOR_TEXT);
@@ -152,7 +157,7 @@ public class MainMenu extends JFrame {
                 }
             }
             else if (mode == GameMode.PLAYER_VS_AI) {
-                ChessGUI aiGui = new ChessGUI();
+                new ChessGUI();
             }
         });
     }
@@ -165,7 +170,11 @@ public class MainMenu extends JFrame {
      *(inner class) làm Panel nền 
      */
     class MenuBackgroundPanel extends JPanel {
-        private Image backgroundImage;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private Image backgroundImage;
 
         public MenuBackgroundPanel() {
             try {

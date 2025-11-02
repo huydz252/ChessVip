@@ -9,7 +9,6 @@ import logic.pieces.Rook;
 
 public class Evaluation {
 
-    // Gán giá trị cho từng loại quân (điểm cơ bản)
     private static final int PAWN_VALUE = 100;
     private static final int KNIGHT_VALUE = 300;
     private static final int BISHOP_VALUE = 300;
@@ -30,14 +29,12 @@ public class Evaluation {
                 if (piece == null) continue;
 
                 int value = 0;
-                // Sử dụng 'instanceof' để xác định loại quân
                 if (piece instanceof Pawn) value = PAWN_VALUE;
                 else if (piece instanceof Knight) value = KNIGHT_VALUE;
                 else if (piece instanceof Bishop) value = BISHOP_VALUE;
                 else if (piece instanceof Rook) value = ROOK_VALUE;
                 else if (piece instanceof Queen) value = QUEEN_VALUE;
                 
-                // AI (Đen) là người Tối đa hóa (MAX), người chơi (Trắng) là Tối thiểu hóa (MIN)
                 if (!piece.isWhite()) { // Quân Đen (AI) -> CỘNG điểm
                     evaluation += value;
                 } else { // Quân Trắng (Người chơi) -> TRỪ điểm

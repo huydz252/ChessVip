@@ -164,7 +164,7 @@ public class GameController {
     	return false;
     }
     
-    // Hàm kiểm tra chiếu hết (giữ nguyên)
+    // Hàm kiểm tra chiếu hết 
     public boolean isCheckMate(boolean whiteKing) {
         if (!isCheck(whiteKing)) return false; 
         Piece[][] b = board.getBoard();
@@ -203,8 +203,7 @@ public class GameController {
     }
     
     
-    //LOGIC PHONG CẤP
-
+    //ĐIỀU KIỆN PHONG CẤP
     public boolean isPawnPromotion(Piece piece, int toRow) {
     	
     	if(!(piece instanceof Pawn)) return false;
@@ -244,7 +243,6 @@ public class GameController {
     
     
     // AI
-
     public void handleAITurn() {
         if (gui == null || whiteTurn || chessAI == null) return; 
 

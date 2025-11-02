@@ -5,6 +5,11 @@ import java.io.Serializable;
 import javax.swing.ImageIcon;
 
 public abstract class Piece implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	protected Boolean isWhite;
 	protected int row, col;
 	protected ImageIcon image;
@@ -13,7 +18,6 @@ public abstract class Piece implements Serializable{
         this.isWhite = isWhite;
         this.row = row;
         this.col = col;
-        this.image = image;
     }
 
     public boolean isWhite() { 

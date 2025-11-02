@@ -11,9 +11,12 @@ import java.net.URL;
 
 public class SidebarPanel extends JPanel {
 
-    private GameController gameController;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private GameController gameController;
     private IGameGUI gui;
-    private JTextArea moveListArea;
     private DefaultListModel<String> moveListModel;
 
     public SidebarPanel(GameController gc, IGameGUI gui) {

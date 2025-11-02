@@ -1,11 +1,14 @@
 package ui;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class MenuPanel extends JPanel {
 
-    public JButton localBtn;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public JButton localBtn;
     public JButton aiBtn;
     public JButton onlineBtn;
 

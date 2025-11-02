@@ -8,7 +8,6 @@ import java.awt.Insets;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -18,14 +17,12 @@ import javax.swing.BorderFactory;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.imageio.ImageIO;
-import java.io.IOException;
 
 public class Splash extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    //Định nghĩa màu sắc để dễ quản lý
     private final Color COLOR_BACKGROUND = new Color(48,46,43);
     private final Color COLOR_GREEN = new Color(118, 185, 71); 
     private final Color COLOR_WHITE = Color.WHITE;
@@ -49,18 +46,16 @@ public class Splash extends JFrame {
      */
     public Splash() {
         setTitle("ChessMaster");
-        setUndecorated(true); //  Bỏ viền cửa sổ
+        setUndecorated(true); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 800, 450); 
-        setLocationRelativeTo(null); // Căn giữa màn hình
-
+        setLocationRelativeTo(null); 
         contentPane = new JPanel(new GridBagLayout());
         contentPane.setBackground(COLOR_BACKGROUND);
         setContentPane(contentPane);
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // --- CỘT BÊN TRÁI 
         JLabel lblImage = new JLabel();
         try {
        
@@ -73,22 +68,20 @@ public class Splash extends JFrame {
             System.err.println("Không tìm thấy ảnh /resources/images/logo.png");
         }
         
-        gbc.gridx = 0; // Cột 0
-        gbc.gridy = 0; // Hàng 0
-        gbc.weightx = 0.5; // Chiếm 50% chiều rộng
-        gbc.weighty = 1.0; // Chiếm 100% chiều cao
+        gbc.gridx = 0; 
+        gbc.gridy = 0; 
+        gbc.weightx = 0.5; 
+        gbc.weighty = 1.0; 
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(20, 20, 20, 20); // Padding
+        gbc.insets = new Insets(20, 20, 20, 20);
         contentPane.add(lblImage, gbc);
 
-        // --- CỘT BÊN PHẢI (Text và Nút) ---
         JPanel rightPanel = new JPanel(new GridBagLayout());
-        rightPanel.setOpaque(false); // Làm cho panel trong suốt
+        rightPanel.setOpaque(false); 
         GridBagConstraints gbcRight = new GridBagConstraints();
         gbcRight.gridx = 0;
-        gbcRight.anchor = GridBagConstraints.WEST; // Căn lề trái
+        gbcRight.anchor = GridBagConstraints.WEST; 
 
-        // SỬA: Thêm 3 dòng text
         Font textFont = new Font("Arial", Font.BOLD, 28);
         
         JLabel lblLine1 = new JLabel("ChessMaster");
@@ -108,17 +101,15 @@ public class Splash extends JFrame {
         lblLine3.setFont(textFont);
         lblLine3.setForeground(COLOR_WHITE);
         gbcRight.gridy = 2;
-        gbcRight.insets = new Insets(0, 0, 40, 0); // Khoảng cách lớn trước nút
+        gbcRight.insets = new Insets(0, 0, 40, 0); 
         rightPanel.add(lblLine3, gbcRight);
 
-        // SỬA: Tùy chỉnh nút "Bắt Đầu"
         JButton btnStart = new JButton("Bắt đầu");
         btnStart.setFont(new Font("Arial", Font.BOLD, 20));
         btnStart.setForeground(COLOR_WHITE);
-        btnStart.setBackground(COLOR_GREEN); // Nút màu xanh lá
+        btnStart.setBackground(COLOR_GREEN); 
         btnStart.setFocusPainted(false);
         btnStart.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        // SỬA: Thêm padding cho nút
         btnStart.setBorder(BorderFactory.createEmptyBorder(15, 50, 15, 50)); 
 
         btnStart.addActionListener(new ActionListener() {
@@ -129,15 +120,14 @@ public class Splash extends JFrame {
         });
         
         gbcRight.gridy = 3;
-        gbcRight.anchor = GridBagConstraints.CENTER; // Căn nút ra giữa
+        gbcRight.anchor = GridBagConstraints.CENTER; 
         rightPanel.add(btnStart, gbcRight);
         
-        // Thêm rightPanel vào contentPane
-        gbc.gridx = 1; // Cột 1
-        gbc.weightx = 0.5; // Chiếm 50% còn lại
-        gbc.insets = new Insets(20, 0, 20, 40); // Padding
-        gbc.anchor = GridBagConstraints.CENTER; // Căn giữa theo chiều dọc
-        gbc.fill = GridBagConstraints.NONE; // Không co giãn
+        gbc.gridx = 1; 
+        gbc.weightx = 0.5; 
+        gbc.insets = new Insets(20, 0, 20, 40); 
+        gbc.anchor = GridBagConstraints.CENTER; 
+        gbc.fill = GridBagConstraints.NONE; 
         contentPane.add(rightPanel, gbc);
     }
 }

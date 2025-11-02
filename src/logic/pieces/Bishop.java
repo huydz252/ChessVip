@@ -6,7 +6,12 @@ import javax.swing.ImageIcon;
 
 public class Bishop extends Piece implements Serializable{
 
-    public Bishop(boolean isWhite, int row, int col) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public Bishop(boolean isWhite, int row, int col) {
         super(isWhite, row, col);
     }
 
