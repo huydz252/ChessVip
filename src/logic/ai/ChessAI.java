@@ -58,7 +58,7 @@ public class ChessAI {
      */
     private double minimax(int depth, double alpha, double beta, boolean isMaximizingPlayer) {
         //Điều kiện Dừng
-        if (depth == 0 || gameController.getBoard().isGameOver()) { 
+        if (depth == 0 || gameController.getBoard().isGameOver(this.gameController)) { 
             return Evaluation.evaluateBoard(gameController.getBoard().getBoard());
         }
         

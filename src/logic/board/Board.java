@@ -1,15 +1,20 @@
 package logic.board;
 
+import logic.pieces.Bishop;
 import logic.pieces.King;
+import logic.pieces.Knight;
+import logic.pieces.Pawn;
 import logic.pieces.Queen;
+import logic.pieces.Rook;
 import logic.pieces.Piece;
-import logic.move.Move;   // nhớ import class Move
+import logic.GameController;
+import logic.move.Move;   
 import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
     private Piece[][] board;
-    private List<Move> moveHistory;  // lịch sử nước đi
+    private List<Move> moveHistory;  
 
     public Board() {
         board = new Piece[8][8];
@@ -20,7 +25,7 @@ public class Board {
     private void setupPieces() {
     	
     	
-    	/*
+    	
         // --- Quân trắng ---
         // Hàng 6: Pawn
         for (int col = 0; col < 8; col++) {
@@ -83,12 +88,11 @@ public class Board {
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
         
-        */
-    	
-    	
-        //test chiếu tướng:
-    	/*
         
+    	
+    	/*
+        //test chiếu tướng:
+    	
         // Vua Đen bị cô lập ở góc 
         board[0][7] = new King(false, 0, 7); // h8
         board[0][7].loadImage(); 
@@ -117,7 +121,7 @@ public class Board {
         */
         
         
-        
+        /*
         // --- TEST HÒA CỜ (STALEMATE) ---
         // Kịch bản: Trắng đi 1 nước (Hậu c6 -> b6) sẽ dẫn đến hòa cờ.
         
@@ -142,6 +146,8 @@ public class Board {
         // 2. Các ô Vua Đen có thể đi (a7, b7, b8) đều bị Hậu (b6) và Vua (c7) kiểm soát.
         // -> HÒA CỜ (Stalemate).
         
+        */
+        
     }
     
     
@@ -156,7 +162,8 @@ public class Board {
     }
 
     public boolean undoLastMove() {
-        if (moveHistory.isEmpty()) return false;
+        if (moveHistory.isEmpty() || moveHistory.size() == 0) return false;
+        
         else {
         	Move lastMove = moveHistory.remove(moveHistory.size() - 1);
             lastMove.undo(board);
@@ -190,9 +197,31 @@ public class Board {
     	return pieces;
     }
 
-	public boolean isGameOver() {
+    
+    /**
+     * NHẬN GameController làm tham số
+     * @param controller Đối tượng GameController đang chạy
+     * @return true nếu game đã kết thúc (Checkmate hoặc Stalemate)
+     */
+	public boolean isGameOver(GameController controller) {
 		
-		return false;
+		if (controller == null) {
+            System.err.println("Lỗi: GameController bị null khi kiểm tra isGameOver");
+            return false;
+        }
+
+        boolean isWhite = controller.isWhiteTurn();
+
+	    if (controller.hasAnyLegalMove(isWhite)) {
+	        return false; 
+	    }
+	    
+	    
+	    if (controller.isCheck(isWhite)) {
+	        return true; 
+	    } else {
+	        return true; 
+	    }
 	} 
 }
 

@@ -95,6 +95,7 @@ public class GameController {
 
         if (leaveInCheck) {
             board.undoLastMove(); 
+            board.undoLastMove(); 
             return false;
         }
 
@@ -127,12 +128,16 @@ public class GameController {
     
     public void undoLastMove() {
         if(board.undoLastMove()) {
-        	whiteTurn = !whiteTurn; 
+        	System.out.println("undo thành công");
         }
     }
 
     public Board getBoard() {
         return board;
+    }
+    
+    public GameMode getGameMode() {
+    	return this.gameMode;
     }
     
     public boolean isCheck(boolean whiteKing) {
@@ -200,6 +205,58 @@ public class GameController {
             }
         }
         return true;
+    }
+    
+    /**
+     * Kiểm tra xem một phe (Trắng hoặc Đen) 
+     * có còn BẤT KỲ nước đi hợp lệ nào không.
+     * (Hàm này là bản sao của isCheckMate nhưng đảo ngược logic)
+     * @param whiteKing true để kiểm tra quân Trắng, false cho quân Đen
+     * @return true nếu còn ít nhất 1 nước đi, false nếu hết nước
+     */
+    public boolean hasAnyLegalMove(boolean whiteKing) {
+        Piece[][] b = board.getBoard();
+        List<Piece> pieces = board.getAllPieces(whiteKing); 
+
+        for (Piece piece : pieces) {
+            int originalRow = piece.getRow();
+            int originalCol = piece.getCol();
+
+            for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    Piece target = b[r][c];
+                    
+                    // Kiểm tra xem quân cờ có thể di chuyển đến (r, c) không
+                    if (piece.isValidMove(r, c, b)) {
+                        
+                        // Giả lập nước đi
+                        b[originalRow][originalCol] = null;
+                        b[r][c] = piece;
+                        piece.setPosition(r, c);
+
+                        // Kiểm tra xem nước đi có hợp lệ không (không tự chiếu)
+                        if (!isCheck(whiteKing)) { 
+                            
+                            // UNDO NGAY LẬP TỨC
+                            piece.setPosition(originalRow, originalCol);
+                            b[originalRow][originalCol] = piece;
+                            b[r][c] = target;
+                            
+                            // CHỈ CẦN TÌM THẤY 1 NƯỚC -> TRẢ VỀ TRUE
+                            return true; 
+                        }
+
+                        // Undo (cho trường hợp nước đi không hợp lệ)
+                        piece.setPosition(originalRow, originalCol);
+                        b[originalRow][originalCol] = piece;
+                        b[r][c] = target;
+                    }
+                }
+            }
+        }
+        
+        // Nếu vòng lặp kết thúc mà không tìm thấy nước nào
+        return false; 
     }
     
     
@@ -272,18 +329,16 @@ public class GameController {
                                               (char)('a' + toCol) + String.valueOf(8 - toRow);
                                               
                             gui.updateGame(notation, true); 
+                            
+                            if (isCheck(true)) { 
+                                if (isCheckMate(true)) {
+                                    gui.showMessage("Chiêu hết!", "Bạn đã bị AI chiếu hết. Bạn thua.");
+                                }
+                            } else if (!hasAnyLegalMove(true)) { 
+                                gui.showMessage("Hòa cờ!", "Hòa cờ.");
+                            }
                         }
-                    } else {
-                        String msg;
-                        if (isCheck(false)) { 
-                            msg = "Trắng thắng (Checkmate)! Chúc mừng.";
-                        } else {
-                            msg = "Hòa (Stalemate)! Ván cờ kết thúc.";
-                        }
-                        if(gui != null) {
-                        	gui.showMessage("Thông báo!", msg);
-                        }
-                    }
+                    } 
                     
                 } catch (Exception ex) {
                     ex.printStackTrace();
