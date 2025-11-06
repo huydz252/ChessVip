@@ -18,13 +18,11 @@ public class PlayerInfoPanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY)); // Viền trên
 
-        // (Thêm avatar ở đây)
         playerNameLabel = new JLabel("Chơi ẩn danh");
         playerNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         playerNameLabel.setForeground(ChessGUI.COLOR_TEXT);
         add(playerNameLabel);
 
-        // Nhãn lượt đi
         turnLabel = new JLabel("Trắng đi");
         turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
         turnLabel.setForeground(Color.RED);

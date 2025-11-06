@@ -22,7 +22,7 @@ public class NetworkManager {
         this.gameController = controller;
     }
 
-    //Host ---
+    //
     public void startHost() {
         this.isHost = true;
         new Thread(() -> {
@@ -32,7 +32,7 @@ public class NetworkManager {
                 System.out.println("Client đã kết nối!");
                 
                 setupStreams();
-                gameController.setClientColor(true); // Host luôn là Trắng
+                gameController.setClientColor(true); 
                 listenForMoves();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -49,8 +49,8 @@ public class NetworkManager {
                 socket = new Socket(hostIp, DEFAULT_PORT);
                 System.out.println("Đã kết nối tới server!");
                 
-                setupStreams();
-                gameController.setClientColor(false); // Client luôn là Đen
+                setupStreams(); 	//out,inputStream
+                gameController.setClientColor(false); 
                 listenForMoves();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -58,18 +58,16 @@ public class NetworkManager {
         }).start();
     }
 
-    //Thiết lập luồng Gửi/Nhận 
     private void setupStreams() throws IOException {
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
     }
 
-    //Gửi nước đi của MÌNH 
     public void sendMove(Move move) {
         if (out != null) {
             try {
                 out.writeObject(move);
-                out.flush(); // Đảm bảo dữ liệu được gửi đi ngay
+                out.flush(); 
                 System.out.println("Đã gửi nước đi: " + move.getFromRow() + "," + move.getFromCol());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -77,7 +75,6 @@ public class NetworkManager {
         }
     }
 
-    //Luôn lắng nghe nước đi của ĐỐI THỦ 
     private void listenForMoves() {
         try {
             while (true) {

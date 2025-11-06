@@ -362,14 +362,14 @@ public class GameController {
                                     gui.showMessage("Chiêu hết!", "Bạn đã bị AI chiếu hết. Bạn thua.");
                                     isGameOver = true;
                                 }
-                            } else if (!hasAnyLegalMove(true)) {
+                            } else if (!hasAnyLegalMove(true) ) {
                             	isGameOver = true;
                                 gui.showMessage("Hòa cờ!", "Hòa cờ.");
                             }
                         }
-                    }
-                    else {
-                    	gui.showMessage("Hòa Cờ", "Hòa Cờ!");
+                    }else if (!hasAnyLegalMove(true) && isCheck(true) && gui != null) {
+                    	isGameOver = true;
+                        gui.showMessage("Hòa cờ!", "Hòa cờ.");
                     }
 
                 } catch (Exception ex) {
