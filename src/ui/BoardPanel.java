@@ -49,7 +49,7 @@ public class BoardPanel extends JPanel {
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                    	if (gameController.isClientTurn()) { 
+                    	if (gameController.isClientTurn() && !gameController.isGameOver()) { 
                             handleClick(r, c);
                         }
                     }

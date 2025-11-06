@@ -23,8 +23,6 @@ public class GameController {
     private IGameGUI gui;
     private GameMode gameMode;
     private NetworkManager networkManager;
-    
-    private boolean isGameOver;
 
     private boolean isClientWhite = true;
 
@@ -76,10 +74,6 @@ public class GameController {
     public boolean isClientWhite() {
         return this.isClientWhite;
     }
-    
-    public boolean isGameOver() {
-    	return this.isGameOver;
-    }
 
     public boolean move(int fromRow, int fromCol, int toRow, int toCol) {
         Piece piece = board.getPiece(fromRow, fromCol);
@@ -113,9 +107,7 @@ public class GameController {
         if (gameMode == GameMode.PLAYER_VS_PLAYER && networkManager != null) {
             networkManager.sendMove(move);
         }
-        
-        
-        //đổi lượt để kiểm tra xem đối phương có bị check, checkmate hay hòa cờ k
+
         whiteTurn = !whiteTurn;
 
         if (isCheck(whiteTurn)) {
@@ -123,8 +115,6 @@ public class GameController {
             if (isCheckMate(whiteTurn)) {
                 String winner = whiteTurn ? "Đen" : "Trắng";
                 String message = "Checkmate!! End game. Người chiến thắng: " + winner;
-                
-                isGameOver = true;
 
                 if (gui != null) {
                     gui.showMessage("Chiếu hết!", message);
@@ -328,8 +318,6 @@ public class GameController {
                 return chessAI.findBestMove();
             }
 
-            
-            
             @Override
             protected void done() {
                 try {
@@ -349,21 +337,15 @@ public class GameController {
                                     + (char) ('a' + toCol) + String.valueOf(8 - toRow);
 
                             gui.updateGame(notation, true);
-                            
-                            //kiểm tra checkmate, stalemate cho người chơi trắng (bản thân)
+
                             if (isCheck(true)) {
                                 if (isCheckMate(true)) {
                                     gui.showMessage("Chiêu hết!", "Bạn đã bị AI chiếu hết. Bạn thua.");
-                                    isGameOver = true;
                                 }
                             } else if (!hasAnyLegalMove(true)) {
-                            	isGameOver = true;
                                 gui.showMessage("Hòa cờ!", "Hòa cờ.");
                             }
                         }
-                    }
-                    else {
-                    	gui.showMessage("Hòa Cờ", "Hòa Cờ!");
                     }
 
                 } catch (Exception ex) {
@@ -414,7 +396,6 @@ public class GameController {
             if (isCheckMate(whiteTurn)) {
                 String winner = whiteTurn ? "Đen" : "Trắng";
                 String message = "Checkmate!! End game. Người chiến thắng: " + winner;
-                isGameOver = true;
 
                 if (gui != null) {
                     gui.showMessage("Chiếu hết!", message);

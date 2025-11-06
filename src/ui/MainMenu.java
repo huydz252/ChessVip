@@ -1,9 +1,9 @@
 package ui;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 import logic.GameMode; // Import GameMode
 
 public class MainMenu extends JFrame {
@@ -130,6 +130,7 @@ public class MainMenu extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 30));
 
         button.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(COLOR_BUTTON_HOVER);
             }

@@ -96,7 +96,9 @@ public class SidebarPanel extends JPanel {
         	//goi y
         	JButton btnHint = createStyledButton("Gợi ý");
             buttonPanel.add(btnHint);
-            buttonPanel.add(btnHint);
+            btnHint.addActionListener(e -> {
+            	gui.showMessage("Gợi ý", "Tính năng đang được phát triển");
+            });
         }
         else if (currentMode == GameMode.PLAYER_VS_PLAYER) {
             JButton drawButton = createStyledButton("Xin hòa");
@@ -167,4 +169,6 @@ public class SidebarPanel extends JPanel {
             moveListModel.removeElementAt(moveListModel.getSize() - 1);
         }
     }
+    
+
 }

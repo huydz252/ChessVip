@@ -24,7 +24,7 @@ public class Board {
 
     private void setupPieces() {
     	
-    	/*
+    	
     	
         // --- Quân trắng ---
         // Hàng 6: Pawn
@@ -88,9 +88,9 @@ public class Board {
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
         
-        */
-    	/*
+        
     	
+    	/*
         //test chiếu tướng:
     	
         // Vua Đen bị cô lập ở góc 
@@ -118,10 +118,10 @@ public class Board {
         board[7][6] = new Rook(true, 7, 6); // e1
         board[7][6].loadImage();
         
-       */
+        */
         
         
-        
+        /*
         // --- TEST HÒA CỜ (STALEMATE) ---
         // Kịch bản: Trắng đi 1 nước (Hậu c6 -> b6) sẽ dẫn đến hòa cờ.
         
@@ -146,7 +146,7 @@ public class Board {
         // 2. Các ô Vua Đen có thể đi (a7, b7, b8) đều bị Hậu (b6) và Vua (c7) kiểm soát.
         // -> HÒA CỜ (Stalemate).
         
-        
+        */
         
     }
     

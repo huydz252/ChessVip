@@ -83,6 +83,7 @@ public class ChessGUI extends JFrame implements IGameGUI{
 	        );
 	}
 	
+	
 	@Override
     public String showPromotionDialog() {
         String[] options = {"Queen", "Rook", "Knight", "Bishop"};
