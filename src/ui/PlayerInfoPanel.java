@@ -1,37 +1,33 @@
 package ui;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class PlayerInfoPanel extends JPanel {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JLabel playerNameLabel;
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private JLabel playerNameLabel;
     private JLabel turnLabel;
     private JLabel materialLabel;
 
     public PlayerInfoPanel() {
         setBackground(ChessGUI.COLOR_PANEL);
-        setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10)); 
+        setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY)); // Viền trên
 
-        // (Thêm avatar ở đây)
-        
         playerNameLabel = new JLabel("Chơi ẩn danh");
         playerNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         playerNameLabel.setForeground(ChessGUI.COLOR_TEXT);
         add(playerNameLabel);
 
-        // Nhãn lượt đi
         turnLabel = new JLabel("Trắng đi");
         turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        turnLabel.setForeground(Color.RED); 
+        turnLabel.setForeground(Color.RED);
         add(turnLabel);
 
-       
     }
 
     public void updateTurn(boolean isWhiteTurn) {

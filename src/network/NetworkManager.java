@@ -10,66 +10,89 @@ public class NetworkManager {
 
     private GameController gameController;
     private Socket socket;
+    private ServerSocket serverSocket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-
-    private boolean isHost;
-
+    private int restart = 0; 	//0 = host, -1 = client
+    private String IPHost;
 
     private static final int DEFAULT_PORT = 9999; 
 
     public NetworkManager(GameController controller) {
         this.gameController = controller;
     }
+    
+    public int getRestart() {
+    	return this.restart;
+    }
+    
+    public void setRestart(int num) {
+    	this.restart = num;
+    }
+    
+    public String getIPHost() {
+    	return this.IPHost;
+    }
 
-    //Host ---
     public void startHost() {
-        this.isHost = true;
         new Thread(() -> {
-            try (ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT)) {
+            
+            try {
+                this.serverSocket = new ServerSocket(DEFAULT_PORT); 
                 System.out.println("Server đang chờ kết nối tại cổng " + DEFAULT_PORT + "...");
-                socket = serverSocket.accept();
+                socket = serverSocket.accept(); 
                 System.out.println("Client đã kết nối!");
                 
                 setupStreams();
-                gameController.setClientColor(true); // Host luôn là Trắng
-                listenForMoves();
+                gameController.setClientColor(true); 
+                listenForObjects(); 
             } catch (IOException e) {
-                e.printStackTrace();
+                if (serverSocket != null && !serverSocket.isClosed()) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
 
     //Join 
     public void startJoin(String hostIp) {
-        this.isHost = false;
+    	this.IPHost = hostIp;
         new Thread(() -> {
             try {
                 System.out.println("Đang kết nối tới " + hostIp + ":" + DEFAULT_PORT + "...");
                 socket = new Socket(hostIp, DEFAULT_PORT);
                 System.out.println("Đã kết nối tới server!");
-                
-                setupStreams();
-                gameController.setClientColor(false); // Client luôn là Đen
-                listenForMoves();
+                setupStreams(); 	//out,inputStream
+                gameController.setClientColor(false); 
+                listenForObjects();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
     }
+    
+    public void close() {
+        try {
+            System.out.println("Đang đóng các kết nối mạng...");
+            if (out != null) out.close();
+            if (in != null) in.close();
+            if (socket != null) socket.close();
+            if (serverSocket != null) serverSocket.close(); // <-- QUAN TRỌNG NHẤT
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    //Thiết lập luồng Gửi/Nhận 
     private void setupStreams() throws IOException {
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
     }
-
-    //Gửi nước đi của MÌNH 
+    
     public void sendMove(Move move) {
         if (out != null) {
             try {
                 out.writeObject(move);
-                out.flush(); // Đảm bảo dữ liệu được gửi đi ngay
+                out.flush(); 
                 System.out.println("Đã gửi nước đi: " + move.getFromRow() + "," + move.getFromCol());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -77,19 +100,40 @@ public class NetworkManager {
         }
     }
 
-    //Luôn lắng nghe nước đi của ĐỐI THỦ 
-    private void listenForMoves() {
+    private void listenForObjects() { 
         try {
             while (true) {
-                Move opponentMove = (Move) in.readObject();
-                System.out.println("Đã nhận nước đi!");
+                Object obj = in.readObject(); 
 
-                SwingUtilities.invokeLater(() -> {
-                    gameController.applyNetworkMove(opponentMove);
-                });
+                if (obj instanceof Move) {
+                    Move opponentMove = (Move) obj;
+                    System.out.println("Đã nhận nước đi!");
+                    SwingUtilities.invokeLater(() -> {
+                        gameController.applyNetworkMove(opponentMove);
+                    });
+
+                } else if (obj instanceof String) {
+                    String command = (String) obj;
+                    System.out.println("Đã nhận lệnh: " + command);
+                    SwingUtilities.invokeLater(() -> {
+                        gameController.applyNetworkCommand(command); 
+                    });
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Mất kết nối!");
+        }
+    }
+    
+    public void sendCommand(String command) {
+        if (out != null) {
+            try {
+                out.writeObject(command); 
+                out.flush();
+                System.out.println("Đã gửi lệnh: " + command);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -11,4 +11,7 @@ public interface IGameGUI {
 	void showMessage(String title, String message);
 	
 	String showPromotionDialog();
+	void showGameOverDialog(String title, String message);
+	
+	
 }

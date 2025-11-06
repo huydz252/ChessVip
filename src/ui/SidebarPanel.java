@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import logic.GameController;
+import logic.GameMode;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,32 +28,48 @@ public class SidebarPanel extends JPanel {
         setBackground(ChessGUI.COLOR_PANEL); 
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        JLabel opponentLabel;
         
-        try {
-            URL imageUrl = getClass().getResource("/resources/images/bot.png");
-            if (imageUrl != null) {
-                ImageIcon originalIcon = new ImageIcon(imageUrl);
-                Image scaledImage = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                ImageIcon botIcon = new ImageIcon(scaledImage);
-                
-                opponentLabel = new JLabel("Agent (Bot)", botIcon, SwingConstants.LEADING); 
-            } else {
-                opponentLabel = new JLabel("Agent (Bot)"); // Dùng chữ nếu không tìm thấy ảnh
-                System.err.println("Không tìm thấy ảnh: /images/bot.png");
-            }
-        } catch (Exception e) {
-             opponentLabel = new JLabel("Agent (Bot)");
-             System.err.println("Lỗi khi nạp ảnh bot: " + e.getMessage());
+        String labelText = "";
+        URL imageUrl = null;
+        
+        GameMode mode = gameController.getGameMode();
+        
+        if (mode == GameMode.PLAYER_VS_AI) {
+            labelText = "Agent (Bot)";
+            imageUrl = getClass().getResource("/resources/images/bot.png");
+            
+        } else if (mode == GameMode.PLAYER_VS_PLAYER) {
+
+            labelText = "Player ABC"; 
+            imageUrl = getClass().getResource("/resources/images/player.png");
+            
+        } else {
+            labelText = "Đối thủ";
+            imageUrl = getClass().getResource("/resources/images/default.png");
         }
 
+        ImageIcon opponentIcon = null; 
+        try {
+            if (imageUrl == null) {
+                throw new Exception("Không tìm thấy tài nguyên ảnh.");
+            }
+            ImageIcon originalIcon = new ImageIcon(imageUrl);
+            Image scaledImage = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            opponentIcon = new ImageIcon(scaledImage);
+            
+        } catch (Exception e) {
+             System.err.println("Lỗi khi nạp ảnh: " + e.getMessage());
+        }
+        
+        JLabel opponentLabel = new JLabel(labelText, opponentIcon, SwingConstants.LEADING);
         opponentLabel.setFont(new Font("Arial", Font.BOLD, 18));
         opponentLabel.setForeground(ChessGUI.COLOR_TEXT);
         opponentLabel.setBorder(new EmptyBorder(10, 5, 10, 5));
-        
         opponentLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
         add(opponentLabel, BorderLayout.NORTH);
+
+        
 
         moveListModel = new DefaultListModel<>();
         JList<String> moveList = new JList<>(moveListModel);
@@ -65,21 +82,47 @@ public class SidebarPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        buttonPanel.setOpaque(false); // Trong suốt
+        buttonPanel.setOpaque(false); 
+        
+        GameMode currentMode = gameController.getGameMode();
+        if(currentMode == GameMode.PLAYER_VS_AI) {
+        	//undo
+        	JButton btnUndo = createStyledButton("Undo");
+        	btnUndo.addActionListener(this::onUndo);
+        	buttonPanel.add(btnUndo);
+        	
+        	//goi y
+        	JButton btnHint = createStyledButton("Gợi ý");
+            buttonPanel.add(btnHint);
+            btnHint.addActionListener(e -> {
+            	gui.showMessage("Gợi ý", "Tính năng đang được phát triển");
+            });
+        }
+        else if (currentMode == GameMode.PLAYER_VS_PLAYER) {
+            JButton drawButton = createStyledButton("Xin hòa");
+            drawButton.addActionListener(e -> {
+                gui.showMessage("Thông báo", "Đã gửi yêu cầu xin hòa!");
+                //update sau: gửi yêu cầu xin hòa qua mạng
+            });
+            buttonPanel.add(drawButton);
+        }
 
-        JButton btnUndo = createStyledButton("Undo");
-        JButton btnRestart = createStyledButton("Menu");
-        JButton btnResign = createStyledButton("Đầu hàng");
-        JButton btnHint = createStyledButton("Gợi ý");
-
-        btnUndo.addActionListener(this::onUndo);
-        btnRestart.addActionListener(e -> gui.restartGame());
-        btnResign.addActionListener(this::onResign);
-
-        buttonPanel.add(btnUndo);
-        buttonPanel.add(btnHint);
-        buttonPanel.add(btnRestart);
-        buttonPanel.add(btnResign);
+        JButton menuButton = createStyledButton("Menu");
+        menuButton.addActionListener(e -> {
+            gui.restartGame(); 
+        });
+        buttonPanel.add(menuButton);
+        
+        JButton resignButton = createStyledButton("Đầu hàng");
+        resignButton.addActionListener(e -> {
+            if(onResign()) {
+            	gameController.setIsGameOver(true);
+            	gameController.getBoard().isGameOver(gc);
+            }
+        });
+        buttonPanel.add(resignButton);
+        
+        add(buttonPanel, BorderLayout.SOUTH);
         
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -99,10 +142,12 @@ public class SidebarPanel extends JPanel {
 
     private void onUndo(ActionEvent e) {
         gameController.undoLastMove();
-        gui.updateGame(null, false); // false = không phải nước đi mới
+        gameController.undoLastMove();
+        gui.updateGame("Undo AI", false); // false = không phải nước đi mới
+        gui.updateGame("Undo Player", false);
     }
 
-    private void onResign(ActionEvent e) {
+    private boolean onResign() {
         int choice = JOptionPane.showConfirmDialog(
             this, 
             "Bạn có chắc muốn chấp nhận thua?", 
@@ -110,9 +155,9 @@ public class SidebarPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
         
         if (choice == JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(this, "Bạn đã thua. Ván cờ kết thúc.");
-            // (Thêm logic khóa bàn cờ ở đây)
+            return true;
         }
+        return false;
     }
 
     public void addMove(String moveNotation) {
@@ -124,4 +169,6 @@ public class SidebarPanel extends JPanel {
             moveListModel.removeElementAt(moveListModel.getSize() - 1);
         }
     }
+    
+
 }

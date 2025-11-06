@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class BoardPanel extends JPanel {
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                    	if (gameController.isClientTurn()) { 
+                    	if (gameController.isClientTurn() && !gameController.getIsGameOver()) { 
                             handleClick(r, c);
                         }
                     }

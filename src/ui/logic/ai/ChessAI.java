@@ -50,8 +50,6 @@ public class ChessAI {
 
         long endTime = System.currentTimeMillis();
         System.out.println("AI Search Time: " + (endTime - startTime) + "ms");
-        
-        
         return bestMove;
     }
 

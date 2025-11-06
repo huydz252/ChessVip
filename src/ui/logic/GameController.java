@@ -1,8 +1,6 @@
 package logic;
 
 import java.util.List;
-
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import logic.ai.ChessAI;
 import logic.board.Board;
@@ -24,13 +22,7 @@ public class GameController {
     private ChessAI chessAI;
     private IGameGUI gui;
     private GameMode gameMode;
-    
     private NetworkManager networkManager;
-    private boolean iWantToReplay = false;
-    private boolean opponentWantsToReplay = false;
-    
-    private boolean isGameOver;
-   
 
     private boolean isClientWhite = true;
 
@@ -82,14 +74,6 @@ public class GameController {
     public boolean isClientWhite() {
         return this.isClientWhite;
     }
-    
-    public boolean getIsGameOver() {
-    	return this.isGameOver;
-    }
-    
-    public void setIsGameOver(boolean over) {
-		this.isGameOver = over;
-	}
 
     public boolean move(int fromRow, int fromCol, int toRow, int toCol) {
         Piece piece = board.getPiece(fromRow, fromCol);
@@ -123,29 +107,18 @@ public class GameController {
         if (gameMode == GameMode.PLAYER_VS_PLAYER && networkManager != null) {
             networkManager.sendMove(move);
         }
-        
-        
-        //đổi lượt để kiểm tra xem đối phương có bị check, checkmate hay hòa cờ k
+
         whiteTurn = !whiteTurn;
 
         if (isCheck(whiteTurn)) {
             System.out.println("Check!");
             if (isCheckMate(whiteTurn)) {
                 String winner = whiteTurn ? "Đen" : "Trắng";
-                String message = "Checkmate!! Người chiến thắng: " + winner;
-                
-                isGameOver = true;
+                String message = "Checkmate!! End game. Người chiến thắng: " + winner;
 
                 if (gui != null) {
-                	gui.showGameOverDialog("Kết thúc ván đấu", message);
-
+                    gui.showMessage("Chiếu hết!", message);
                 }
-            }  
-        }else {
-            if(!hasAnyLegalMove(whiteTurn) && gui != null) {
-            	
-            	isGameOver = true;
-            	gui.showGameOverDialog("Hòa rồi", "Bạn và đối thủ đã hòa ván này");
             }
         }
 
@@ -338,15 +311,13 @@ public class GameController {
             return;
         }
 
-        new SwingWorker<Move, Void>() {	
+        new SwingWorker<Move, Void>() {
 
             @Override
             protected Move doInBackground() throws Exception {
                 return chessAI.findBestMove();
             }
 
-            
-            
             @Override
             protected void done() {
                 try {
@@ -359,24 +330,20 @@ public class GameController {
                         int toRow = aiMove.getToRow();
                         int toCol = aiMove.getToCol();
 
-                        if (move(fromRow, fromCol, toRow, toCol)) {			//gọi hàm Move thực hiện di chuyển nước đi
+                        if (move(fromRow, fromCol, toRow, toCol)) {
 
                             String notation = (char) ('a' + fromCol) + String.valueOf(8 - fromRow)
                                     + (aiMove.getCaptured() != null ? "x" : "-")
                                     + (char) ('a' + toCol) + String.valueOf(8 - toRow);
 
                             gui.updateGame(notation, true);
-                            
-                            //kiểm tra checkmate, stalemate cho người chơi trắng (bản thân)
+
                             if (isCheck(true)) {
                                 if (isCheckMate(true)) {
-                                	gui.showGameOverDialog("Kết thúc ván đấu", "Bạn đã bị AI đánh bại haha!!");
-                                    isGameOver = true;
+                                    gui.showMessage("Chiêu hết!", "Bạn đã bị AI chiếu hết. Bạn thua.");
                                 }
-                            }
-                            if (!hasAnyLegalMove(true) && isCheck(true) && gui != null) {
-                            	gui.showGameOverDialog("Kết thúc ván đấu", "Game đấu hòa!");
-                            	isGameOver = true;
+                            } else if (!hasAnyLegalMove(true)) {
+                                gui.showMessage("Hòa cờ!", "Hòa cờ.");
                             }
                         }
                     }
@@ -429,48 +396,11 @@ public class GameController {
             if (isCheckMate(whiteTurn)) {
                 String winner = whiteTurn ? "Đen" : "Trắng";
                 String message = "Checkmate!! End game. Người chiến thắng: " + winner;
-                isGameOver = true;
 
                 if (gui != null) {
-                    gui.showGameOverDialog("Kết thúc ván đấu", message);
+                    gui.showMessage("Chiếu hết!", message);
                 }
             }
-        }else {
-        	if(!hasAnyLegalMove(whiteTurn) && gui != null) {
-        		isGameOver = true;
-        		gui.showGameOverDialog("Kết thúc ván đấu!", "Bạn và đối thủ đã hòa ván này!");
-        	}
-        }
-    }
-
-	public void applyNetworkCommand(String command) {
-        if (command.equals("REPLAY_REQUEST")) {
-            this.opponentWantsToReplay = true;
-            checkReplayStatus();
-        }
-        else if (command.equals("RESTART_NOW")) {
-            gui.restartGame(); 
-        }
-    }
-
-	public void userClickedReplay() {
-        this.iWantToReplay = true;
-        if (networkManager != null) {
-            networkManager.sendCommand("REPLAY_REQUEST");
-        }
-        checkReplayStatus();
-    }
-	
-	private void checkReplayStatus() {
-        if (iWantToReplay && opponentWantsToReplay) {
-            this.iWantToReplay = false;
-            this.opponentWantsToReplay = false;
-            
-            if (isClientWhite) { 
-                networkManager.sendCommand("RESTART_NOW");
-            }
-            
-            gui.restartGame(); 
         }
     }
 
