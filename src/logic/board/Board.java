@@ -87,8 +87,10 @@ public class Board {
         
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
+       
         
         */
+    	
     	/*
     	
         //test chiếu tướng:
@@ -97,21 +99,17 @@ public class Board {
         board[0][7] = new King(false, 0, 7); // h8
         board[0][7].loadImage(); 
         
-        // Tốt đen cản đường thoát của Vua (tùy chọn)
         board[1][7] = new Pawn(false, 1, 7); // h7
         board[1][7].loadImage();
 
         // --- Quân Trắng (White) ---
         
-        // Hậu Trắng ở e5 - Vị trí để tấn công ô f7
         board[4][4] = new Queen(true, 4, 4); // e5 
         board[4][4].loadImage();
         
-        // Tượng Trắng ở d6 - Kiểm soát g8, ô thoát tiềm năng.
         board[2][3] = new Bishop(true, 2, 3); // d6
         board[2][3].loadImage();
         
-        // Vua Trắng (ở một vị trí an toàn, không tham gia tấn công)
         board[7][4] = new King(true, 7, 4); // e1
         board[7][4].loadImage();
         
@@ -126,25 +124,17 @@ public class Board {
         // Kịch bản: Trắng đi 1 nước (Hậu c6 -> b6) sẽ dẫn đến hòa cờ.
         
         // --- Quân Đen ---
-        // Vua Đen ở góc a8
         board[0][0] = new King(false, 0, 0); // a8
         board[0][0].loadImage(); 
         
         // --- Quân Trắng ---
         
-        // Vua Trắng ở c7, kiểm soát ô b7 và b8
         board[1][2] = new King(true, 1, 2); // c7
         board[1][2].loadImage();
         
-        // Hậu Trắng ở c6, CHUẨN BỊ di chuyển đến b6
         board[2][2] = new Queen(true, 2, 2); // c6
         board[2][2].loadImage();
         
-        // MỤC TIÊU: Bạn (Trắng) di chuyển Hậu từ c6 -> b6.
-        // Sau nước đi đó:
-        // 1. Vua Đen (a8) KHÔNG bị chiếu.
-        // 2. Các ô Vua Đen có thể đi (a7, b7, b8) đều bị Hậu (b6) và Vua (c7) kiểm soát.
-        // -> HÒA CỜ (Stalemate).
         
         
         

@@ -129,6 +129,12 @@ public class GameController {
                 if (gui != null) {
                     gui.showMessage("Chiếu hết!", message);
                 }
+            }  
+        }else {
+            if(!hasAnyLegalMove(whiteTurn) && gui != null) {
+            	
+            	isGameOver = true;
+            	gui.showMessage("Hòa!!", "Bạn và đối thủ đã hòa ván này");
             }
         }
 
@@ -321,7 +327,7 @@ public class GameController {
             return;
         }
 
-        new SwingWorker<Move, Void>() {
+        new SwingWorker<Move, Void>() {	
 
             @Override
             protected Move doInBackground() throws Exception {
@@ -342,7 +348,7 @@ public class GameController {
                         int toRow = aiMove.getToRow();
                         int toCol = aiMove.getToCol();
 
-                        if (move(fromRow, fromCol, toRow, toCol)) {
+                        if (move(fromRow, fromCol, toRow, toCol)) {			//gọi hàm Move thực hiện di chuyển nước đi
 
                             String notation = (char) ('a' + fromCol) + String.valueOf(8 - fromRow)
                                     + (aiMove.getCaptured() != null ? "x" : "-")
@@ -420,6 +426,11 @@ public class GameController {
                     gui.showMessage("Chiếu hết!", message);
                 }
             }
+        }else {
+        	if(!hasAnyLegalMove(whiteTurn) && gui != null) {
+        		isGameOver = true;
+        		gui.showMessage("Hòa!", "Bạn và đối thủ đã hòa ván này!");
+        	}
         }
     }
 

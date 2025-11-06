@@ -83,6 +83,8 @@ public class NetworkManager {
             while (true) {
                 Move opponentMove = (Move) in.readObject();
                 System.out.println("Đã nhận nước đi!");
+                
+                
 
                 SwingUtilities.invokeLater(() -> {
                     gameController.applyNetworkMove(opponentMove);
