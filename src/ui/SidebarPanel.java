@@ -61,14 +61,12 @@ public class SidebarPanel extends JPanel {
              System.err.println("Lỗi khi nạp ảnh: " + e.getMessage());
         }
         
-        // 4. Tạo và Cài đặt JLabel (CHỈ MỘT LẦN)
         JLabel opponentLabel = new JLabel(labelText, opponentIcon, SwingConstants.LEADING);
         opponentLabel.setFont(new Font("Arial", Font.BOLD, 18));
         opponentLabel.setForeground(ChessGUI.COLOR_TEXT);
         opponentLabel.setBorder(new EmptyBorder(10, 5, 10, 5));
         opponentLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        // 5. Thêm vào Panel (CHỈ MỘT LẦN)
         add(opponentLabel, BorderLayout.NORTH);
 
         
@@ -117,8 +115,10 @@ public class SidebarPanel extends JPanel {
         
         JButton resignButton = createStyledButton("Đầu hàng");
         resignButton.addActionListener(e -> {
-            gui.showMessage("Kết thúc", "Bạn đã đầu hàng!");
-            gameController.getBoard().isGameOver(gc);
+            if(onResign()) {
+            	gameController.setIsGameOver(true);
+            	gameController.getBoard().isGameOver(gc);
+            }
         });
         buttonPanel.add(resignButton);
         
@@ -147,7 +147,7 @@ public class SidebarPanel extends JPanel {
         gui.updateGame("Undo Player", false);
     }
 
-    private void onResign(ActionEvent e) {
+    private boolean onResign() {
         int choice = JOptionPane.showConfirmDialog(
             this, 
             "Bạn có chắc muốn chấp nhận thua?", 
@@ -155,9 +155,9 @@ public class SidebarPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
         
         if (choice == JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(this, "Bạn đã thua. Ván cờ kết thúc.");
-            // (Thêm logic khóa bàn cờ ở đây)
+            return true;
         }
+        return false;
     }
 
     public void addMove(String moveNotation) {

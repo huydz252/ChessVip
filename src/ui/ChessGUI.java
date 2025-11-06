@@ -101,5 +101,25 @@ public class ChessGUI extends JFrame implements IGameGUI{
         }
         return choice;
     }
+
+	@Override
+	public void showGameOverDialog(String title, String message) {
+		String [] options = {"Chơi lại", "Về Menu"};
+		int choice = JOptionPane.showOptionDialog(
+	            this, 
+	            message, 
+	            title, 
+	            JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+		if(choice == JOptionPane.YES_OPTION) {
+			restartGame();
+		}else if (choice == JOptionPane.NO_OPTION){
+			dispose();
+			SwingUtilities.invokeLater(MainMenu::new);
+		}   
+	}
    
 }

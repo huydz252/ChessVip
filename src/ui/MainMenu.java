@@ -76,10 +76,10 @@ public class MainMenu extends JFrame {
                     options,
                     options[0]); // (Mặc định chọn Host)
 
-            if (choice == JOptionPane.YES_OPTION) { // 0 = Host
+            if (choice == JOptionPane.YES_OPTION) { 
                 startGame(GameMode.PLAYER_VS_PLAYER, 0, null);
 
-            } else if (choice == JOptionPane.NO_OPTION) { // 1 = Join
+            } else if (choice == JOptionPane.NO_OPTION) { 
                 String ip = JOptionPane.showInputDialog(
                         this,
                         "Nhập địa chỉ IP của Host:",

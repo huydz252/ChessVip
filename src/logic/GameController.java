@@ -1,6 +1,8 @@
 package logic;
 
 import java.util.List;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import logic.ai.ChessAI;
 import logic.board.Board;
@@ -22,9 +24,13 @@ public class GameController {
     private ChessAI chessAI;
     private IGameGUI gui;
     private GameMode gameMode;
+    
     private NetworkManager networkManager;
+    private boolean iWantToReplay = false;
+    private boolean opponentWantsToReplay = false;
     
     private boolean isGameOver;
+   
 
     private boolean isClientWhite = true;
 
@@ -77,9 +83,13 @@ public class GameController {
         return this.isClientWhite;
     }
     
-    public boolean isGameOver() {
+    public boolean getIsGameOver() {
     	return this.isGameOver;
     }
+    
+    public void setIsGameOver(boolean over) {
+		this.isGameOver = over;
+	}
 
     public boolean move(int fromRow, int fromCol, int toRow, int toCol) {
         Piece piece = board.getPiece(fromRow, fromCol);
@@ -122,19 +132,20 @@ public class GameController {
             System.out.println("Check!");
             if (isCheckMate(whiteTurn)) {
                 String winner = whiteTurn ? "Đen" : "Trắng";
-                String message = "Checkmate!! End game. Người chiến thắng: " + winner;
+                String message = "Checkmate!! Người chiến thắng: " + winner;
                 
                 isGameOver = true;
 
                 if (gui != null) {
-                    gui.showMessage("Chiếu hết!", message);
+                	gui.showGameOverDialog("Kết thúc ván đấu", message);
+
                 }
             }  
         }else {
             if(!hasAnyLegalMove(whiteTurn) && gui != null) {
             	
             	isGameOver = true;
-            	gui.showMessage("Hòa!!", "Bạn và đối thủ đã hòa ván này");
+            	gui.showGameOverDialog("Hòa rồi", "Bạn và đối thủ đã hòa ván này");
             }
         }
 
@@ -359,17 +370,15 @@ public class GameController {
                             //kiểm tra checkmate, stalemate cho người chơi trắng (bản thân)
                             if (isCheck(true)) {
                                 if (isCheckMate(true)) {
-                                    gui.showMessage("Chiêu hết!", "Bạn đã bị AI chiếu hết. Bạn thua.");
+                                	gui.showGameOverDialog("Kết thúc ván đấu", "Bạn đã bị AI đánh bại haha!!");
                                     isGameOver = true;
                                 }
-                            } else if (!hasAnyLegalMove(true) ) {
+                            }
+                            if (!hasAnyLegalMove(true) && isCheck(true) && gui != null) {
+                            	gui.showGameOverDialog("Kết thúc ván đấu", "Game đấu hòa!");
                             	isGameOver = true;
-                                gui.showMessage("Hòa cờ!", "Hòa cờ.");
                             }
                         }
-                    }else if (!hasAnyLegalMove(true) && isCheck(true) && gui != null) {
-                    	isGameOver = true;
-                        gui.showMessage("Hòa cờ!", "Hòa cờ.");
                     }
 
                 } catch (Exception ex) {
@@ -423,14 +432,45 @@ public class GameController {
                 isGameOver = true;
 
                 if (gui != null) {
-                    gui.showMessage("Chiếu hết!", message);
+                    gui.showGameOverDialog("Kết thúc ván đấu", message);
                 }
             }
         }else {
         	if(!hasAnyLegalMove(whiteTurn) && gui != null) {
         		isGameOver = true;
-        		gui.showMessage("Hòa!", "Bạn và đối thủ đã hòa ván này!");
+        		gui.showGameOverDialog("Kết thúc ván đấu!", "Bạn và đối thủ đã hòa ván này!");
         	}
+        }
+    }
+
+	public void applyNetworkCommand(String command) {
+        if (command.equals("REPLAY_REQUEST")) {
+            this.opponentWantsToReplay = true;
+            checkReplayStatus();
+        }
+        else if (command.equals("RESTART_NOW")) {
+            gui.restartGame(); 
+        }
+    }
+
+	public void userClickedReplay() {
+        this.iWantToReplay = true;
+        if (networkManager != null) {
+            networkManager.sendCommand("REPLAY_REQUEST");
+        }
+        checkReplayStatus();
+    }
+	
+	private void checkReplayStatus() {
+        if (iWantToReplay && opponentWantsToReplay) {
+            this.iWantToReplay = false;
+            this.opponentWantsToReplay = false;
+            
+            if (isClientWhite) { 
+                networkManager.sendCommand("RESTART_NOW");
+            }
+            
+            gui.restartGame(); 
         }
     }
 

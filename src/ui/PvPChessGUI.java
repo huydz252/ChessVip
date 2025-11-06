@@ -7,7 +7,6 @@ import logic.GameController;
 import logic.GameMode;
 import network.NetworkManager;
 
-// LỚP NÀY DÀNH RIÊNG CHO CHƠI MẠNG (PvP)
 public class PvPChessGUI extends JFrame implements IGameGUI{
 
 	private static final long serialVersionUID = 1L;
@@ -15,7 +14,7 @@ public class PvPChessGUI extends JFrame implements IGameGUI{
     private BoardPanel boardPanel;
     private SidebarPanel sidebarPanel;       
     private PlayerInfoPanel playerInfoPanel; 
-    private NetworkManager networkManager; // Logic mạng nằm ở đây
+    private NetworkManager networkManager;
 
     public static final Color COLOR_BACKGROUND = new Color(211, 211, 211);
     public static final Color COLOR_PANEL = Color.WHITE;
@@ -62,8 +61,25 @@ public class PvPChessGUI extends JFrame implements IGameGUI{
     
     @Override
     public void restartGame() {
-        dispose();
-        SwingUtilities.invokeLater(MainMenu::new);
+        
+        if (networkManager != null) {
+            networkManager.close();
+        }
+
+        dispose();  
+        
+         if(networkManager.getRestart() == 0) {  
+            SwingUtilities.invokeLater(() -> {
+                PvPChessGUI newGui = new PvPChessGUI();
+                newGui.startHostGame();
+            });
+        } else {  
+            String ip = networkManager.getIPHost();
+            SwingUtilities.invokeLater(() -> {
+                PvPChessGUI newGui = new PvPChessGUI();
+                newGui.startJoinGame(ip);
+            });
+        }
     }
     
     @Override
@@ -88,6 +104,7 @@ public class PvPChessGUI extends JFrame implements IGameGUI{
     
     public void startJoinGame(String ip) {
         if (networkManager != null) {
+        	networkManager.setRestart(1);
             networkManager.startJoin(ip);
             setTitle("ChessMaster (Client) - Đang kết nối tới " + ip + "...");
         }
@@ -120,5 +137,28 @@ public class PvPChessGUI extends JFrame implements IGameGUI{
         }
         return choice;
     }
+
+	@Override
+	public void showGameOverDialog(String title, String message) {
+		String [] options = {"Chơi lại", "Về Menu"};
+		int choice = JOptionPane.showOptionDialog(
+	            this, 
+	            message, 
+	            title, 
+	            JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+		if(choice == JOptionPane.YES_OPTION) {
+			gameController.userClickedReplay();
+	        this.setTitle("Đang chờ đối thủ đồng ý chơi lại...");
+		}else if (choice == JOptionPane.NO_OPTION){
+			dispose();
+			SwingUtilities.invokeLater(MainMenu::new);
+		}   
+	}
+	
+	
 
 }
