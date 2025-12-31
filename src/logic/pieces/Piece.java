@@ -43,7 +43,7 @@ public abstract class Piece implements Serializable{
     
     public abstract void loadImage();
 
-    public abstract char getSymbol(); 	//nhận diện quân nào và màu nào 
+    public abstract char getSymbol(); 	
     
     public abstract boolean isValidMove(int newRow, int newCol, Piece[][] board);
 }

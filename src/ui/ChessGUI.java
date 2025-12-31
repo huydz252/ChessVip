@@ -5,6 +5,7 @@ import java.awt.*;
 
 import logic.GameController;
 import logic.GameMode;
+import ui.BoardPanel;
 public class ChessGUI extends JFrame implements IGameGUI{
 
     /**
@@ -20,11 +21,12 @@ public class ChessGUI extends JFrame implements IGameGUI{
     public static final Color COLOR_PANEL = Color.WHITE;
     public static final Color COLOR_TEXT = Color.BLACK;
 
-    public ChessGUI() {
+    public ChessGUI(int aiDifficulty) {
     	
         gameController = new GameController(this, GameMode.PLAYER_VS_AI);
+        gameController.setAIDifficulty(aiDifficulty);
         
-        setTitle("Chess AI Pro");
+        setTitle("Chess AI Pro - Độ khó cấp: " + aiDifficulty);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());  
 
@@ -97,29 +99,36 @@ public class ChessGUI extends JFrame implements IGameGUI{
                 options[0]);
         
         if (choice == null || choice.isEmpty()) {
-            choice = "Queen"; // Mặc định là Hậu
+            choice = "Queen";
         }
         return choice;
     }
 
 	@Override
 	public void showGameOverDialog(String title, String message) {
-		String [] options = {"Chơi lại", "Về Menu"};
-		int choice = JOptionPane.showOptionDialog(
+//		String [] options = {"Chơi lại", "Về Menu"};
+//		int choice = JOptionPane.showOptionDialog(
+//	            this, 
+//	            message, 
+//	            title, 
+//	            JOptionPane.YES_NO_OPTION,
+//                JOptionPane.QUESTION_MESSAGE,
+//                null,
+//                options,
+//                options[0]);
+//		if(choice == JOptionPane.YES_OPTION) {
+//			restartGame();
+//		}else if (choice == JOptionPane.NO_OPTION){
+//			dispose();
+//			SwingUtilities.invokeLater(MainMenu::new);
+//		}   
+//		
+		JOptionPane.showMessageDialog(
 	            this, 
 	            message, 
 	            title, 
-	            JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]);
-		if(choice == JOptionPane.YES_OPTION) {
-			restartGame();
-		}else if (choice == JOptionPane.NO_OPTION){
-			dispose();
-			SwingUtilities.invokeLater(MainMenu::new);
-		}   
+	            JOptionPane.INFORMATION_MESSAGE
+	        );
 	}
    
 }
