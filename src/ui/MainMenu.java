@@ -62,7 +62,30 @@ public class MainMenu extends JFrame {
             JOptionPane.showMessageDialog(this, "Chức năng hướng dẫn đang được phát triển!");
         });
 
-        pvaiButton.addActionListener(e -> startGame(GameMode.PLAYER_VS_AI));
+        pvaiButton.addActionListener(e -> {
+        	String[] options = {"Dễ (Depth 2)", "Trung Bình (Depth 3)", "Khó (Depth 4)"};
+        	int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Chọn độ khó của máy:",
+                    "Thiết lập trận đấu",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, 
+                    options,
+                    options[1]); 
+
+            if (choice != -1) {
+                int selectedDepth;
+                switch (choice) {
+                    case 0: selectedDepth = 2; break; 
+                    case 1: selectedDepth = 3; break; 
+                    case 2: selectedDepth = 4; break; 
+                    default: selectedDepth = 3;
+                }
+                
+                startGameAI(selectedDepth);
+            }
+        });
 
         pvpButton.addActionListener(e -> {
             String[] options = {"Host (Tạo phòng)", "Join (Vào phòng)"};
@@ -88,7 +111,7 @@ public class MainMenu extends JFrame {
                 );
 
                 if (ip != null && !ip.trim().isEmpty()) {
-                    startGame(GameMode.PLAYER_VS_PLAYER, 1, ip.trim());
+                	startGame(GameMode.PLAYER_VS_PLAYER, 1, ip.trim());
                 }
                 // Nếu hủy, không làm gì cả
             }
@@ -142,6 +165,10 @@ public class MainMenu extends JFrame {
         return button;
     }
 
+    private void startGame(GameMode mode) {
+        startGame(mode, -1, null);
+    }
+    
     private void startGame(GameMode mode, int pvpRole, String ip) {
         dispose();
         SwingUtilities.invokeLater(() -> {
@@ -154,13 +181,18 @@ public class MainMenu extends JFrame {
                     pvpGui.startJoinGame(ip);
                 }
             } else if (mode == GameMode.PLAYER_VS_AI) {
-                new ChessGUI();
+                new ChessGUI(2);	//mặc định là 3 nếu gọi theo đường này
             }
         });
     }
-
-    private void startGame(GameMode mode) {
-        startGame(mode, -1, null);
+    
+    
+    private void startGameAI(int depth) {
+        dispose(); // Đóng MainMenu
+        SwingUtilities.invokeLater(() -> {
+            // Gọi Constructor mới của ChessGUI (nhận tham số depth)
+            new ChessGUI(depth); 
+        });
     }
 
     /**
