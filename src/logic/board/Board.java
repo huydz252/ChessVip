@@ -24,7 +24,7 @@ public class Board {
 
     private void setupPieces() {
     	
-    	
+    	/*
     	
         // --- Quân trắng ---
         // Hàng 6: Pawn
@@ -88,10 +88,10 @@ public class Board {
         board[0][7] = new Rook(false, 0, 7);
         board[0][7].loadImage();
        
-        
+        */
         
     	
-    	/*
+    	
     	
         //test chiếu tướng:
     	
@@ -116,7 +116,7 @@ public class Board {
         board[7][6] = new Rook(true, 7, 6); // e1
         board[7][6].loadImage();
      
-       */
+       
         
         /*
         

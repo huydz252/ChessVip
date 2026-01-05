@@ -19,6 +19,7 @@ public class SidebarPanel extends JPanel {
 	private GameController gameController;
     private IGameGUI gui;
     private DefaultListModel<String> moveListModel;
+	private JButton menuButton;
 
     public SidebarPanel(GameController gc, IGameGUI gui) {
         this.gameController = gc;
@@ -40,7 +41,7 @@ public class SidebarPanel extends JPanel {
             
         } else if (mode == GameMode.PLAYER_VS_PLAYER) {
 
-            labelText = "Player ABC"; 
+            labelText = "Chơi với bạn"; 
             imageUrl = getClass().getResource("/resources/images/player.png");
             
         } else {
@@ -101,26 +102,22 @@ public class SidebarPanel extends JPanel {
         else if (currentMode == GameMode.PLAYER_VS_PLAYER) {
             JButton drawButton = createStyledButton("Xin hòa");
             drawButton.addActionListener(e -> {
-                gui.showMessage("Thông báo", "Đã gửi yêu cầu xin hòa!");
+                gui.showMessage("Thông báo", "Tính năng sắp phát triển!");
                 //update sau: gửi yêu cầu xin hòa qua mạng
             });
             buttonPanel.add(drawButton);
         }
-
-        JButton menuButton = createStyledButton("Menu");
+        
+        if(currentMode == GameMode.PLAYER_VS_AI) {
+        	menuButton = createStyledButton("Menu");
+        }else {
+        	menuButton = createStyledButton("Chơi lại" );
+        }
         menuButton.addActionListener(e -> {
             gui.restartGame(); 
         });
         buttonPanel.add(menuButton);
         
-        JButton resignButton = createStyledButton("Đầu hàng");
-        resignButton.addActionListener(e -> {
-            if(onResign()) {
-            	gameController.setIsGameOver(true);
-            	gameController.getBoard().isGameOver(gc);
-            }
-        });
-        buttonPanel.add(resignButton);
         
         add(buttonPanel, BorderLayout.SOUTH);
         
