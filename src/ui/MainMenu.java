@@ -59,7 +59,10 @@ public class MainMenu extends JFrame {
         add(mainPanel);
 
         tutorialButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chức năng hướng dẫn đang được phát triển!");
+            //JOptionPane.showMessageDialog(this, "Chức năng hướng dẫn đang được phát triển!");
+        	
+        	TutorialDialog tutorial = new TutorialDialog(this); 
+            tutorial.setVisible(true);
         });
 
         pvaiButton.addActionListener(e -> {
