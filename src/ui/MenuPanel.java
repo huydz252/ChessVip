@@ -13,5 +13,6 @@ public class MenuPanel extends JPanel {
     public JButton onlineBtn;
 
     public MenuPanel() {
+    	
     }
 }

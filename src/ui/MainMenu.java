@@ -59,7 +59,10 @@ public class MainMenu extends JFrame {
         add(mainPanel);
 
         tutorialButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chức năng hướng dẫn đang được phát triển!");
+            //JOptionPane.showMessageDialog(this, "Chức năng hướng dẫn đang được phát triển!");
+        	
+        	TutorialDialog tutorial = new TutorialDialog(this); 
+            tutorial.setVisible(true);
         });
 
         pvaiButton.addActionListener(e -> {
@@ -210,7 +213,6 @@ public class MainMenu extends JFrame {
             try {
                 backgroundImage = new ImageIcon(getClass().getResource("/resources/images/menu_background.png")).getImage();
             } catch (Exception e) {
-                System.err.println("Không thể tải ảnh nền. Sử dụng màu mặc định.");
                 backgroundImage = null;
             }
         }
