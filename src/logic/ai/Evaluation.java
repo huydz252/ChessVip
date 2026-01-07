@@ -53,7 +53,6 @@ public class Evaluation {
         -20,-10,-10,-10,-10,-10,-10,-20
     };
     
-    // (Xe và Hậu thường ít phụ thuộc vào vị trí tĩnh hơn, ta có thể thêm sau nếu cần)
 
     // Bảng điểm cho Vua (Giữa trận: Nấp kỹ ở góc; Tàn cuộc: Ra giữa bàn)
     // Đây là bảng "Giữa trận" (Midgame) - Ưu tiên an toàn
@@ -99,11 +98,12 @@ public class Evaluation {
     }
 
     private static double getPositionBonus(Piece piece, int r, int c) {
+    	
         // Lưu ý: Bảng điểm được thiết kế cho góc nhìn của quân TRẮNG (hàng 0-7).
         // Nếu là quân ĐEN, chúng ta cần "lật ngược" bàn cờ để tính điểm tương ứng.
         
         int row = piece.isWhite() ? r : 7 - r; // Lật ngược hàng nếu là Đen
-        int col = c; // Cột đối xứng qua trục dọc không đổi với bảng này
+        int col = c;
         
         int index = row * 8 + col; // Chuyển tọa độ 2D thành index mảng 1D
 
@@ -112,6 +112,6 @@ public class Evaluation {
         if (piece instanceof Bishop) return BISHOP_TABLE[index];
         if (piece instanceof King) return KING_MID_TABLE[index];
         
-        return 0; // Xe và Hậu chưa cần bonus vị trí phức tạp lúc này
+        return 0; 
     }
 }

@@ -213,7 +213,6 @@ public class MainMenu extends JFrame {
             try {
                 backgroundImage = new ImageIcon(getClass().getResource("/resources/images/menu_background.png")).getImage();
             } catch (Exception e) {
-                System.err.println("Không thể tải ảnh nền. Sử dụng màu mặc định.");
                 backgroundImage = null;
             }
         }

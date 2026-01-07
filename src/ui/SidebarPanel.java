@@ -118,10 +118,8 @@ public class SidebarPanel extends JPanel {
         });
         buttonPanel.add(menuButton);
         
-        
         add(buttonPanel, BorderLayout.SOUTH);
-        
-        add(buttonPanel, BorderLayout.SOUTH);
+
     }
 
     private JButton createStyledButton(String text) {

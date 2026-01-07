@@ -18,7 +18,7 @@ import java.util.Comparator;
 public class ChessAI {
 
     private final GameController gameController;
-    private int maxDepth = 3;
+    private int maxDepth = 3;	
 
     public ChessAI(GameController gc) {
         this.gameController = gc;
@@ -34,14 +34,11 @@ public class ChessAI {
     public Move findBestMove() {
         long startTime = System.currentTimeMillis();
         
-        // AI là quân Đen -> Cần tìm nước đi có điểm ÂM NHẤT (Minimize)
-        double bestEval = Double.POSITIVE_INFINITY;
+        double bestEval = Double.POSITIVE_INFINITY; 
         Move bestMove = null;
 
-        // 1. Lấy tất cả nước đi
-        List<Move> legalMoves = generateAllLegalMoves(false); // false = Đen
-
-        // 2. Sắp xếp nước đi (Ăn quân trước) để tối ưu tốc độ
+        //lay, sap xep
+        List<Move> legalMoves = generateAllLegalMoves(false); //Đen
         orderMoves(legalMoves);
 
         if (legalMoves.isEmpty()) {
@@ -52,7 +49,6 @@ public class ChessAI {
             
             gameController.getBoard().executeMove(move);
             
-            // Gọi Minimax
             double eval = minimax(maxDepth - 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, true); 
 
             gameController.getBoard().undoLastMove();
@@ -70,29 +66,28 @@ public class ChessAI {
     }
 
     /**
-     * Minimax với Alpha-Beta Pruning
+     * Minimax với Alpha-Beta 
      */
     private double minimax(int depth, double alpha, double beta, boolean isMaximizingPlayer) {
         
-        // --- 1. Điều kiện Dừng ---
+        // điều kiện dừng
         if (depth == 0) { 
-            // THAY VÌ TRẢ VỀ ĐIỂM NGAY, HÃY CHẠY QUIESCENCE SEARCH
-            // Để tránh lỗi "Horizon Effect" (thí xe bắt tốt)
+        	//ktra -> tránh đi ngu 
             return quiescenceSearch(alpha, beta, isMaximizingPlayer);
         }
         
         if (gameController.getBoard().isGameOver(gameController)) {
-             if (gameController.isCheck(!isMaximizingPlayer)) {
+             if (gameController.isCheck(isMaximizingPlayer)) {
                  // Checkmate: Ưu tiên thắng sớm (cộng/trừ depth)
                  return isMaximizingPlayer 
-                         ? -10000000.0 + depth 
-                         :  10000000.0 - depth;
+                         ? -10000000.0 - depth 
+                         :  10000000.0 + depth;
              }
              return 0; // Stalemate
         }
 
         List<Move> legalMoves = generateAllLegalMoves(isMaximizingPlayer);
-        orderMoves(legalMoves); // Sắp xếp để cắt tỉa tốt hơn
+        orderMoves(legalMoves);
 
         if (isMaximizingPlayer) { // Trắng (MAX)
             double maxEval = Double.NEGATIVE_INFINITY;
@@ -216,7 +211,7 @@ public class ChessAI {
     }
 
     /**
-     * Hàm sinh nước đi (Giữ nguyên logic cũ của bạn, copy vào đây)
+     * Hàm sinh nước đi 
      */
     private List<Move> generateAllLegalMoves(boolean isWhite) {
         List<Move> allMoves = new ArrayList<>();
@@ -234,28 +229,24 @@ public class ChessAI {
                                 int oldR = piece.getRow(); 
                                 int oldC = piece.getCol(); 
                                 
-                                // Biến cờ để ghi nhận nước đi hợp lệ
                                 boolean isLegal = false; 
 
                                 try {
-                                    // 1. Giả lập nước đi
+                                    // Giả lập nước đi
                                     board[r1][c1] = null;
                                     board[r2][c2] = piece;
                                     piece.setPosition(r2, c2); 
                                     
-                                    // 2. Kiểm tra luật (Vua an toàn?)
+                                    // Kiểm tra luật (Vua an toàn?)
                                     if (!gameController.isCheck(isWhite)) {
                                         isLegal = true; // Đánh dấu là hợp lệ
                                     }
                                 } finally {
-                                    // 3. Hoàn tác (Trả quân về vị trí cũ)
                                     piece.setPosition(oldR, oldC); 
                                     board[r1][c1] = piece;
                                     board[r2][c2] = captured;
                                 }
 
-                                // 4. TẠO MOVE Ở ĐÂY (SAU KHI ĐÃ HOÀN TÁC)
-                                // Lúc này piece đã về chỗ cũ (oldR, oldC), nên Move sẽ lấy đúng tọa độ.
                                 if (isLegal) {
                                     allMoves.add(new Move(piece, r2, c2, captured)); 
                                 }
